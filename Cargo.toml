@@ -1,10 +1,10 @@
 [package]
 name         = "ibc-proto"
-version      = "0.20.1"
+version      = "0.21.0"
 authors      = ["Informal Systems <hello@informal.systems>"]
 edition      = "2021"
 license      = "Apache-2.0"
-repository   = "https://github.com/cosmos/ibc-proto-rs/tree/main/proto"
+repository   = "https://github.com/cosmos/ibc-proto-rs"
 readme       = "README.md"
 categories   = ["cryptography::cryptocurrencies", "encoding", "no-std"]
 keywords     = ["blockchain", "cosmos", "tendermint", "ibc", "proto"]

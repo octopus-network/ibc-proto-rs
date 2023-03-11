@@ -64,6 +64,19 @@ pub struct QueryAccountRequest {
     #[prost(string, tag="1")]
     pub address: ::prost::alloc::string::String,
 }
+/// QueryModuleAccountsRequest is the request type for the Query/ModuleAccounts RPC method.
+///
+/// Since: cosmos-sdk 0.46
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryModuleAccountsRequest {
+}
+/// QueryParamsResponse is the response type for the Query/Params RPC method.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryParamsResponse {
+    /// params defines the parameters of the module.
+    #[prost(message, optional, tag="1")]
+    pub params: ::core::option::Option<Params>,
+}
 /// QueryAccountResponse is the response type for the Query/Account RPC method.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryAccountResponse {
@@ -75,19 +88,6 @@ pub struct QueryAccountResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryParamsRequest {
 }
-/// QueryParamsResponse is the response type for the Query/Params RPC method.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryParamsResponse {
-    /// params defines the parameters of the module.
-    #[prost(message, optional, tag="1")]
-    pub params: ::core::option::Option<Params>,
-}
-/// QueryModuleAccountsRequest is the request type for the Query/ModuleAccounts RPC method.
-///
-/// Since: cosmos-sdk 0.46
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryModuleAccountsRequest {
-}
 /// QueryModuleAccountsResponse is the response type for the Query/ModuleAccounts RPC method.
 ///
 /// Since: cosmos-sdk 0.46
@@ -95,18 +95,6 @@ pub struct QueryModuleAccountsRequest {
 pub struct QueryModuleAccountsResponse {
     #[prost(message, repeated, tag="1")]
     pub accounts: ::prost::alloc::vec::Vec<super::super::super::google::protobuf::Any>,
-}
-/// QueryModuleAccountByNameRequest is the request type for the Query/ModuleAccountByName RPC method.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryModuleAccountByNameRequest {
-    #[prost(string, tag="1")]
-    pub name: ::prost::alloc::string::String,
-}
-/// QueryModuleAccountByNameResponse is the response type for the Query/ModuleAccountByName RPC method.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryModuleAccountByNameResponse {
-    #[prost(message, optional, tag="1")]
-    pub account: ::core::option::Option<super::super::super::google::protobuf::Any>,
 }
 /// Bech32PrefixRequest is the request type for Bech32Prefix rpc method.
 ///
@@ -353,29 +341,6 @@ pub mod query_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// ModuleAccountByName returns the module account info by module name
-        pub async fn module_account_by_name(
-            &mut self,
-            request: impl tonic::IntoRequest<super::QueryModuleAccountByNameRequest>,
-        ) -> Result<
-            tonic::Response<super::QueryModuleAccountByNameResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/cosmos.auth.v1beta1.Query/ModuleAccountByName",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
         /// Bech32Prefix queries bech32Prefix
         ///
         /// Since: cosmos-sdk 0.46
@@ -492,14 +457,6 @@ pub mod query_server {
             &self,
             request: tonic::Request<super::QueryModuleAccountsRequest>,
         ) -> Result<tonic::Response<super::QueryModuleAccountsResponse>, tonic::Status>;
-        /// ModuleAccountByName returns the module account info by module name
-        async fn module_account_by_name(
-            &self,
-            request: tonic::Request<super::QueryModuleAccountByNameRequest>,
-        ) -> Result<
-            tonic::Response<super::QueryModuleAccountByNameResponse>,
-            tonic::Status,
-        >;
         /// Bech32Prefix queries bech32Prefix
         ///
         /// Since: cosmos-sdk 0.46
@@ -765,48 +722,6 @@ pub mod query_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ModuleAccountsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/cosmos.auth.v1beta1.Query/ModuleAccountByName" => {
-                    #[allow(non_camel_case_types)]
-                    struct ModuleAccountByNameSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryModuleAccountByNameRequest>
-                    for ModuleAccountByNameSvc<T> {
-                        type Response = super::QueryModuleAccountByNameResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<
-                                super::QueryModuleAccountByNameRequest,
-                            >,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).module_account_by_name(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = ModuleAccountByNameSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

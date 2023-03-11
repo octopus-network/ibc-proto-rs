@@ -207,11 +207,6 @@ pub mod ibc {
                 include_proto!("ibc.lightclients.tendermint.v1.rs");
             }
         }
-        pub mod grandpa {
-            pub mod v1 {
-                include_proto!("ibc.lightclients.grandpa.v1.rs");
-            }
-        }
     }
     pub mod mock {
         include_proto!("ibc.mock.rs");

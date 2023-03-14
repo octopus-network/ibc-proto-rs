@@ -201,10 +201,18 @@ pub mod ibc {
             pub mod v1 {
                 include_proto!("ibc.lightclients.solomachine.v1.rs");
             }
+            pub mod v2 {
+                include_proto!("ibc.lightclients.solomachine.v2.rs");
+            }
         }
         pub mod tendermint {
             pub mod v1 {
                 include_proto!("ibc.lightclients.tendermint.v1.rs");
+            }
+        }
+        pub mod grandpa {
+            pub mod v1 {
+                include_proto!("ibc.lightclients.grandpa.v1.rs");
             }
         }
     }

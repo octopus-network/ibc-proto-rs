@@ -187,8 +187,8 @@ pub struct SubchainHeaderMap {
     /// map<blocknumber,scale-encoded blockheader>
     ///
     /// map<uint32,Timestamp> timestamp_map=2;
-    #[prost(map="uint32, message", tag="1")]
-    pub subchain_header_map: ::std::collections::HashMap<u32, SubchainHeader>,
+    #[prost(btree_map="uint32, message", tag="1")]
+    pub subchain_header_map: ::prost::alloc::collections::BTreeMap<u32, SubchainHeader>,
 }
 /// subchain header
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -206,8 +206,8 @@ pub struct ParachainHeaderMap {
     /// map<blocknumber,ParachainHeader>
     ///
     ///   map<uint32,Timestamp> timestamp_map=2;
-    #[prost(map="uint32, message", tag="1")]
-    pub parachain_header_map: ::std::collections::HashMap<u32, ParachainHeader>,
+    #[prost(btree_map="uint32, message", tag="1")]
+    pub parachain_header_map: ::prost::alloc::collections::BTreeMap<u32, ParachainHeader>,
 }
 /// data needed to prove parachain header inclusion in mmr
 #[derive(Clone, PartialEq, ::prost::Message)]

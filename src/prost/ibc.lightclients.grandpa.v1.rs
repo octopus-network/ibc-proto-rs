@@ -1,6 +1,6 @@
 // chain type
 // enum ChainType {
-//    // solochain
+//    // subchain
 //    CHAIN_TYPE_SOLOCHAIN_UNSPECIFIED = 0;
 //    // parachain
 //    CHAIN_TYPE_PARACHAIN = 1;
@@ -10,7 +10,7 @@
 /// and a possible frozen height.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ClientState {
-    /// 0: solochain
+    /// 0: subchain
     /// 1: parachain
     #[prost(uint32, tag="1")]
     pub chain_type: u32,
@@ -30,7 +30,7 @@ pub struct ClientState {
     /// Latest mmr root hash
     #[prost(bytes="vec", tag="6")]
     pub mmr_root_hash: ::prost::alloc::vec::Vec<u8>,
-    /// latest solochain or parachain height
+    /// latest subchain or parachain height
     #[prost(uint32, tag="7")]
     pub latest_chain_height: u32,
     /// Block height when the client was frozen due to a misbehaviour
@@ -180,20 +180,20 @@ pub struct ConsensusState {
     #[prost(bytes="vec", tag="2")]
     pub root: ::prost::alloc::vec::Vec<u8>,
 }
-/// solochain header map
+/// subchain header map
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SolochainHeaderMap {
+pub struct SubchainHeaderMap {
     /// LatestMMR latest_mmr = 1;
     /// map<blocknumber,scale-encoded blockheader>
     ///
     /// map<uint32,Timestamp> timestamp_map=2;
     #[prost(map="uint32, message", tag="1")]
-    pub solochain_header_map: ::std::collections::HashMap<u32, SolochainHeader>,
+    pub subchain_header_map: ::std::collections::HashMap<u32, SubchainHeader>,
 }
-/// solochain header
+/// subchain header
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SolochainHeader {
-    /// scale-encoded solochain header bytes
+pub struct SubchainHeader {
+    /// scale-encoded subchain header bytes
     #[prost(bytes="vec", tag="1")]
     pub block_header: ::prost::alloc::vec::Vec<u8>,
     /// timestamp and proof
@@ -259,9 +259,9 @@ pub mod header {
     /// only one header
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Message {
-        /// solochain headers and their proofs
+        /// subchain headers and their proofs
         #[prost(message, tag="2")]
-        SolochainHeaderMap(super::SolochainHeaderMap),
+        SubchainHeaderMap(super::SubchainHeaderMap),
         /// parachain headers and their proofs
         #[prost(message, tag="3")]
         ParachainHeaderMap(super::ParachainHeaderMap),

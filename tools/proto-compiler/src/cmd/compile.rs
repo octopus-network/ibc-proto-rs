@@ -93,6 +93,10 @@ impl CompileCmd {
         let attrs_jsonschema_str =
             r#"#[cfg_attr(feature = "json-schema", schemars(with = "String"))]"#;
 
+        // custom `prost_build::Config`.
+        let mut config = prost_build::Config::new();
+        config.btree_map(&["."]);
+
         let compilation = tonic_build::configure()
             .build_client(true)
             .compile_well_known_types(true)
@@ -168,7 +172,7 @@ impl CompileCmd {
             .type_attribute(".cosmos.base.v1beta1", attrs_serde)
             .type_attribute(".cosmos.base.query.v1beta1", attrs_serde)
             .type_attribute(".cosmos.bank.v1beta1", attrs_serde)
-            .compile(&protos, &includes);
+            .compile_with_config(config, &protos, &includes);
 
         match compilation {
             Ok(_) => {

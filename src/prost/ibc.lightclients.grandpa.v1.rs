@@ -1,11 +1,3 @@
-// chain type
-// enum ChainType {
-//    // subchain
-//    CHAIN_TYPE_SOLOCHAIN_UNSPECIFIED = 0;
-//    // parachain
-//    CHAIN_TYPE_PARACHAIN = 1;
-// }
-
 /// ClientState from Beefy tracks the current validator set, latest height,
 /// and a possible frozen height.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -23,19 +15,19 @@ pub struct ClientState {
     /// block number that the beefy protocol was activated on the relay chain.
     /// This should be the first block in the merkle-mountain-range tree.
     #[prost(uint32, tag="4")]
-    pub beefy_activation_block: u32,
+    pub beefy_activation_height: u32,
     /// the latest mmr_root_hash height
-    #[prost(uint32, tag="5")]
-    pub latest_beefy_height: u32,
+    #[prost(message, optional, tag="5")]
+    pub latest_beefy_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
     /// Latest mmr root hash
     #[prost(bytes="vec", tag="6")]
     pub mmr_root_hash: ::prost::alloc::vec::Vec<u8>,
     /// latest subchain or parachain height
-    #[prost(uint32, tag="7")]
-    pub latest_chain_height: u32,
+    #[prost(message, optional, tag="7")]
+    pub latest_chain_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
     /// Block height when the client was frozen due to a misbehaviour
-    #[prost(uint32, tag="8")]
-    pub frozen_height: u32,
+    #[prost(message, optional, tag="8")]
+    pub frozen_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
     /// authorities for the current round
     #[prost(message, optional, tag="9")]
     pub authority_set: ::core::option::Option<BeefyAuthoritySet>,
@@ -193,11 +185,14 @@ pub struct SubchainHeaderMap {
 /// subchain header
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SubchainHeader {
+    /// chain_id string type, eg: ibc-1,astar-1
+    #[prost(string, tag="1")]
+    pub chain_id: ::prost::alloc::string::String,
     /// scale-encoded subchain header bytes
-    #[prost(bytes="vec", tag="1")]
+    #[prost(bytes="vec", tag="2")]
     pub block_header: ::prost::alloc::vec::Vec<u8>,
     /// timestamp and proof
-    #[prost(message, optional, tag="2")]
+    #[prost(message, optional, tag="3")]
     pub timestamp: ::core::option::Option<StateProof>,
 }
 /// / Parachain headers and their merkle proofs.
@@ -212,23 +207,26 @@ pub struct ParachainHeaderMap {
 /// data needed to prove parachain header inclusion in mmr
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ParachainHeader {
-    /// para id
-    #[prost(uint32, tag="1")]
+    /// chain_id string type, eg: ibc-1,astar-1
+    #[prost(string, tag="1")]
+    pub chain_id: ::prost::alloc::string::String,
+    /// para id must be uint
+    #[prost(uint32, tag="2")]
     pub parachain_id: u32,
     /// scale-encoded parachain header bytes
-    #[prost(bytes="vec", tag="2")]
+    #[prost(bytes="vec", tag="3")]
     pub block_header: ::prost::alloc::vec::Vec<u8>,
     /// proofs for parachain header in the mmr_leaf.parachain_heads
-    #[prost(bytes="vec", repeated, tag="3")]
+    #[prost(bytes="vec", repeated, tag="4")]
     pub proofs: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
     /// merkle leaf index for parachain heads proof
-    #[prost(uint32, tag="4")]
+    #[prost(uint32, tag="5")]
     pub header_index: u32,
     /// total number of para heads in parachain_heads_root
-    #[prost(uint32, tag="5")]
+    #[prost(uint32, tag="6")]
     pub header_count: u32,
     /// timestamp and proof
-    #[prost(message, optional, tag="6")]
+    #[prost(message, optional, tag="7")]
     pub timestamp: ::core::option::Option<StateProof>,
 }
 /// state value and proof

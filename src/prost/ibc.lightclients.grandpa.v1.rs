@@ -172,37 +172,27 @@ pub struct ConsensusState {
     #[prost(bytes="vec", tag="2")]
     pub root: ::prost::alloc::vec::Vec<u8>,
 }
-/// subchain header map
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SubchainHeaderMap {
-    /// LatestMMR latest_mmr = 1;
-    /// map<blocknumber,scale-encoded blockheader>
-    ///
-    /// map<uint32,Timestamp> timestamp_map=2;
-    #[prost(btree_map="uint32, message", tag="1")]
-    pub subchain_header_map: ::prost::alloc::collections::BTreeMap<u32, SubchainHeader>,
-}
 /// subchain header
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SubchainHeader {
     /// chain_id string type, eg: ibc-1,astar-1
     #[prost(string, tag="1")]
     pub chain_id: ::prost::alloc::string::String,
+    /// block number(height)
+    #[prost(uint32, tag="2")]
+    pub block_number: u32,
     /// scale-encoded subchain header bytes
-    #[prost(bytes="vec", tag="2")]
+    #[prost(bytes="vec", tag="3")]
     pub block_header: ::prost::alloc::vec::Vec<u8>,
     /// timestamp and proof
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag="4")]
     pub timestamp: ::core::option::Option<StateProof>,
 }
-/// / Parachain headers and their merkle proofs.
+/// subchain header
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ParachainHeaderMap {
-    /// map<blocknumber,ParachainHeader>
-    ///
-    ///   map<uint32,Timestamp> timestamp_map=2;
-    #[prost(btree_map="uint32, message", tag="1")]
-    pub parachain_header_map: ::prost::alloc::collections::BTreeMap<u32, ParachainHeader>,
+pub struct SubchainHeaders {
+    #[prost(message, repeated, tag="1")]
+    pub subchain_headers: ::prost::alloc::vec::Vec<SubchainHeader>,
 }
 /// data needed to prove parachain header inclusion in mmr
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -213,21 +203,30 @@ pub struct ParachainHeader {
     /// para id must be uint
     #[prost(uint32, tag="2")]
     pub parachain_id: u32,
+    /// This block number is relayer chain blocknumber that parachain header packed into relayer block
+    #[prost(uint32, tag="3")]
+    pub relayer_chain_number: u32,
     /// scale-encoded parachain header bytes
-    #[prost(bytes="vec", tag="3")]
+    #[prost(bytes="vec", tag="4")]
     pub block_header: ::prost::alloc::vec::Vec<u8>,
     /// proofs for parachain header in the mmr_leaf.parachain_heads
-    #[prost(bytes="vec", repeated, tag="4")]
+    #[prost(bytes="vec", repeated, tag="5")]
     pub proofs: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
     /// merkle leaf index for parachain heads proof
-    #[prost(uint32, tag="5")]
+    #[prost(uint32, tag="6")]
     pub header_index: u32,
     /// total number of para heads in parachain_heads_root
-    #[prost(uint32, tag="6")]
+    #[prost(uint32, tag="7")]
     pub header_count: u32,
     /// timestamp and proof
-    #[prost(message, optional, tag="7")]
+    #[prost(message, optional, tag="8")]
     pub timestamp: ::core::option::Option<StateProof>,
+}
+/// parachain header array
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ParachainHeaders {
+    #[prost(message, repeated, tag="1")]
+    pub parachain_headers: ::prost::alloc::vec::Vec<ParachainHeader>,
 }
 /// state value and proof
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -259,10 +258,10 @@ pub mod header {
     pub enum Message {
         /// subchain headers and their proofs
         #[prost(message, tag="2")]
-        SubchainHeaderMap(super::SubchainHeaderMap),
+        SubchainHeaders(super::SubchainHeaders),
         /// parachain headers and their proofs
         #[prost(message, tag="3")]
-        ParachainHeaderMap(super::ParachainHeaderMap),
+        ParachainHeaders(super::ParachainHeaders),
     }
 }
 /// Misbehaviour is a wrapper over two conflicting Headers

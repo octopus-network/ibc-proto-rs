@@ -14,26 +14,27 @@ pub struct ClientState {
     pub parachain_id: u32,
     /// block number that the beefy protocol was activated on the relay chain.
     /// This should be the first block in the merkle-mountain-range tree.
-    #[prost(uint32, tag="4")]
-    pub beefy_activation_height: u32,
+    /// uint32 beefy_activation_height = 4;
     /// the latest mmr_root_hash height
-    #[prost(message, optional, tag="5")]
+    #[prost(message, optional, tag="4")]
     pub latest_beefy_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
     /// Latest mmr root hash
-    #[prost(bytes="vec", tag="6")]
-    pub mmr_root_hash: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="5")]
+    pub latest_mmr_root: ::prost::alloc::vec::Vec<u8>,
     /// latest subchain or parachain height
-    #[prost(message, optional, tag="7")]
+    #[prost(message, optional, tag="6")]
     pub latest_chain_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
     /// Block height when the client was frozen due to a misbehaviour
-    #[prost(message, optional, tag="8")]
+    #[prost(message, optional, tag="7")]
     pub frozen_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
+    /// latest authority set
+    ///
     /// authorities for the current round
-    #[prost(message, optional, tag="9")]
-    pub authority_set: ::core::option::Option<BeefyAuthoritySet>,
-    /// authorities for the next round
-    #[prost(message, optional, tag="10")]
-    pub next_authority_set: ::core::option::Option<BeefyAuthoritySet>,
+    /// BeefyAuthoritySet authority_set = 9 [(gogoproto.nullable) = false];
+    /// // authorities for the next round
+    /// BeefyAuthoritySet next_authority_set = 10 [(gogoproto.nullable) = false];
+    #[prost(message, optional, tag="8")]
+    pub latest_authority_set: ::core::option::Option<BeefyAuthoritySet>,
 }
 /// Beefy Authority Info
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -102,11 +103,11 @@ pub struct BeefyMmr {
     #[prost(bytes="vec", repeated, tag="2")]
     pub signature_proofs: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
     /// mmr proof
+    ///
+    /// size of the mmr for the given proof
+    /// uint64 mmr_size = 4;
     #[prost(message, optional, tag="3")]
     pub mmr_leaves_and_batch_proof: ::core::option::Option<MmrLeavesAndBatchProof>,
-    /// size of the mmr for the given proof
-    #[prost(uint64, tag="4")]
-    pub mmr_size: u64,
 }
 /// mmr leaves and proofs
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -193,6 +194,9 @@ pub struct SubchainHeader {
 pub struct SubchainHeaders {
     #[prost(message, repeated, tag="1")]
     pub subchain_headers: ::prost::alloc::vec::Vec<SubchainHeader>,
+    /// mmr proof for header
+    #[prost(message, optional, tag="2")]
+    pub mmr_leaves_and_batch_proof: ::core::option::Option<MmrLeavesAndBatchProof>,
 }
 /// data needed to prove parachain header inclusion in mmr
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -227,6 +231,9 @@ pub struct ParachainHeader {
 pub struct ParachainHeaders {
     #[prost(message, repeated, tag="1")]
     pub parachain_headers: ::prost::alloc::vec::Vec<ParachainHeader>,
+    /// mmr proof for header
+    #[prost(message, optional, tag="2")]
+    pub mmr_leaves_and_batch_proof: ::core::option::Option<MmrLeavesAndBatchProof>,
 }
 /// state value and proof
 #[derive(Clone, PartialEq, ::prost::Message)]

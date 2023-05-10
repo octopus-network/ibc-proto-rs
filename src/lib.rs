@@ -11,6 +11,8 @@
 
 pub mod google;
 pub mod protobuf;
+pub mod traits;
+mod type_urls;
 
 extern crate alloc;
 
@@ -31,6 +33,12 @@ pub const COSMOS_SDK_COMMIT: &str = include_str!("COSMOS_SDK_COMMIT");
 /// The version (commit hash) of IBC Go used when generating this library.
 pub const IBC_GO_COMMIT: &str = include_str!("IBC_GO_COMMIT");
 
+/// The version (commit hash) of cosmos ics used when generating this library.
+pub const COSMOS_ICS_COMMIT: &str = include_str!("COSMOS_ICS_COMMIT");
+
+/// The version (commit hash) of cosmwasm/Wasmd ics used when generating this library.
+pub const WASMD_COMMIT: &str = include_str!("WASMD_COMMIT");
+
 pub mod cosmos {
     pub mod auth {
         pub mod v1beta1 {
@@ -49,69 +57,176 @@ pub mod cosmos {
             }
         }
     }
-    pub mod evidence {
+
+    /// Granting of arbitrary privileges from one account to another.
+    pub mod authz {
         pub mod v1beta1 {
-            include_proto!("cosmos.evidence.v1beta1.rs");
+            include_proto!("cosmos.authz.v1beta1.rs");
         }
     }
-    pub mod staking {
-        pub mod v1beta1 {
-            include_proto!("cosmos.staking.v1beta1.rs");
-        }
-    }
+
+    /// Balances.
     pub mod bank {
         pub mod v1beta1 {
             include_proto!("cosmos.bank.v1beta1.rs");
         }
     }
+
+    /// Base functionality.
     pub mod base {
+        /// Application BlockChain Interface (ABCI).
+        ///
+        /// Interface that defines the boundary between the replication engine
+        /// (the blockchain), and the state machine (the application).
         pub mod abci {
             pub mod v1beta1 {
                 include_proto!("cosmos.base.abci.v1beta1.rs");
             }
         }
+
+        /// Key-value pairs.
         pub mod kv {
             pub mod v1beta1 {
                 include_proto!("cosmos.base.kv.v1beta1.rs");
             }
         }
-        pub mod node {
-            pub mod v1beta1 {
-                include_proto!("cosmos.base.node.v1beta1.rs");
-            }
-        }
+
+        /// Query support.
         pub mod query {
             pub mod v1beta1 {
                 include_proto!("cosmos.base.query.v1beta1.rs");
             }
         }
+
+        /// Reflection support.
         pub mod reflection {
             pub mod v1beta1 {
                 include_proto!("cosmos.base.reflection.v1beta1.rs");
             }
+
+            pub mod v2alpha1 {
+                include_proto!("cosmos.base.reflection.v2alpha1.rs");
+            }
         }
+
+        /// Snapshots containing Tendermint state sync info.
+        pub mod snapshots {
+            pub mod v1beta1 {
+                include_proto!("cosmos.base.snapshots.v1beta1.rs");
+            }
+        }
+
+        /// Data structure that holds the state of the application.
         pub mod store {
             pub mod v1beta1 {
                 include_proto!("cosmos.base.store.v1beta1.rs");
             }
         }
+
         pub mod v1beta1 {
             include_proto!("cosmos.base.v1beta1.rs");
         }
+
         pub mod tendermint {
             pub mod v1beta1 {
                 include_proto!("cosmos.base.tendermint.v1beta1.rs");
             }
         }
     }
+
+    /// Crisis handling
+    pub mod crisis {
+        pub mod v1beta1 {
+            include_proto!("cosmos.crisis.v1beta1.rs");
+        }
+    }
+
+    /// Cryptographic primitives.
     pub mod crypto {
+        /// Multi-signature support.
         pub mod multisig {
+            include_proto!("cosmos.crypto.multisig.rs");
             pub mod v1beta1 {
                 include_proto!("cosmos.crypto.multisig.v1beta1.rs");
             }
         }
+        pub mod ed25519 {
+            include_proto!("cosmos.crypto.ed25519.rs");
+        }
+        pub mod secp256k1 {
+            include_proto!("cosmos.crypto.secp256k1.rs");
+        }
+        pub mod secp256r1 {
+            include_proto!("cosmos.crypto.secp256r1.rs");
+        }
     }
+
+    /// Messages and services handling token distribution
+    pub mod distribution {
+        pub mod v1beta1 {
+            include_proto!("cosmos.distribution.v1beta1.rs");
+        }
+    }
+
+    /// Messages and services handling evidence
+    pub mod evidence {
+        pub mod v1beta1 {
+            include_proto!("cosmos.evidence.v1beta1.rs");
+        }
+    }
+
+    /// Allows accounts to grant fee allowances and to use fees from their accounts.
+    pub mod feegrant {
+        pub mod v1beta1 {
+            include_proto!("cosmos.feegrant.v1beta1.rs");
+        }
+    }
+
+    /// Messages and services handling gentx's
+    pub mod genutil {
+        pub mod v1beta1 {
+            include_proto!("cosmos.genutil.v1beta1.rs");
+        }
+    }
+
+    /// Messages and services handling governance
+    pub mod gov {
+        pub mod v1beta1 {
+            include_proto!("cosmos.gov.v1beta1.rs");
+        }
+    }
+
+    /// Messages and services handling minting
+    pub mod mint {
+        pub mod v1beta1 {
+            include_proto!("cosmos.mint.v1beta1.rs");
+        }
+    }
+
+    /// Messages and services handling chain parameters
+    pub mod params {
+        pub mod v1beta1 {
+            include_proto!("cosmos.params.v1beta1.rs");
+        }
+    }
+
+    /// Handling slashing parameters and unjailing
+    pub mod slashing {
+        pub mod v1beta1 {
+            include_proto!("cosmos.slashing.v1beta1.rs");
+        }
+    }
+
+    /// Proof-of-Stake layer for public blockchains.
+    pub mod staking {
+        pub mod v1beta1 {
+            include_proto!("cosmos.staking.v1beta1.rs");
+        }
+    }
+
+    /// Transactions.
     pub mod tx {
+        /// Transaction signing support.
         pub mod signing {
             pub mod v1beta1 {
                 include_proto!("cosmos.tx.signing.v1beta1.rs");
@@ -121,24 +236,47 @@ pub mod cosmos {
             include_proto!("cosmos.tx.v1beta1.rs");
         }
     }
+
+    /// Services for the upgrade module.
     pub mod upgrade {
         pub mod v1beta1 {
             include_proto!("cosmos.upgrade.v1beta1.rs");
         }
     }
-    pub mod gov {
+
+    /// Services and tx's for the vesting module.
+    pub mod vesting {
         pub mod v1beta1 {
-            include_proto!("cosmos.gov.v1beta1.rs");
+            include_proto!("cosmos.vesting.v1beta1.rs");
+        }
+    }
+
+    pub mod ics23 {
+        include_proto!("ics23.rs");
+    }
+}
+
+/// CosmWasm protobuf definitions.
+#[cfg(feature = "cosmwasm")]
+#[cfg_attr(docsrs, doc(cfg(feature = "cosmwasm")))]
+pub mod cosmwasm {
+    /// Messages and services handling CosmWasm.
+    pub mod wasm {
+        pub mod v1 {
+            include_proto!("cosmwasm.wasm.v1.rs");
         }
     }
 }
 
+/// IBC protobuf definitions.
 pub mod ibc {
     #[deprecated(since = "0.15.0", note = "Use `ibc_proto::ibc::applications` instead")]
     pub mod apps {
         pub use super::applications::*;
     }
+    /// IBC applications.
     pub mod applications {
+        /// Transfer support.
         pub mod transfer {
             pub mod v1 {
                 include_proto!("ibc.applications.transfer.v1.rs");
@@ -152,6 +290,7 @@ pub mod ibc {
                 include_proto!("ibc.applications.fee.v1.rs");
             }
         }
+        /// Interchain accounts support.
         pub mod interchain_accounts {
             pub mod v1 {
                 include_proto!("ibc.applications.interchain_accounts.v1.rs");
@@ -168,33 +307,40 @@ pub mod ibc {
             }
         }
     }
+    /// IBC core.
     pub mod core {
+        /// IBC channels.
         pub mod channel {
             pub mod v1 {
                 include_proto!("ibc.core.channel.v1.rs");
             }
         }
+        /// IBC client.
         pub mod client {
             pub mod v1 {
                 include_proto!("ibc.core.client.v1.rs");
             }
         }
+        /// IBC commitments.
         pub mod commitment {
             pub mod v1 {
                 include_proto!("ibc.core.commitment.v1.rs");
             }
         }
+        /// IBC connections.
         pub mod connection {
             pub mod v1 {
                 include_proto!("ibc.core.connection.v1.rs");
             }
         }
+        /// IBC types.
         pub mod types {
             pub mod v1 {
                 include_proto!("ibc.core.types.v1.rs");
             }
         }
     }
+    /// IBC light clients.
     pub mod lightclients {
         pub mod localhost {
             pub mod v1 {
@@ -204,6 +350,9 @@ pub mod ibc {
         pub mod solomachine {
             pub mod v1 {
                 include_proto!("ibc.lightclients.solomachine.v1.rs");
+            }
+            pub mod v2 {
+                include_proto!("ibc.lightclients.solomachine.v2.rs");
             }
         }
         pub mod tendermint {

@@ -1,37 +1,34 @@
-/// MsgTransfer defines a msg to transfer fungible tokens (i.e Coins) between
-/// ICS20 enabled chains. See ICS Spec here:
-/// <https://github.com/cosmos/ibc/tree/master/spec/app/ics-020-fungible-token-transfer#data-structures>
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// MsgGrantAllowance adds permission for Grantee to spend up to Allowance
+/// of fees from the account of Granter.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgTransfer {
-    /// the port on which the packet will be sent
+pub struct MsgGrantAllowance {
+    /// granter is the address of the user granting an allowance of their funds.
     #[prost(string, tag="1")]
-    pub source_port: ::prost::alloc::string::String,
-    /// the channel by which the packet will be sent
+    pub granter: ::prost::alloc::string::String,
+    /// grantee is the address of the user being granted an allowance of another user's funds.
     #[prost(string, tag="2")]
-    pub source_channel: ::prost::alloc::string::String,
-    /// the tokens to be transferred
+    pub grantee: ::prost::alloc::string::String,
+    /// allowance can be any of basic, periodic, allowed fee allowance.
     #[prost(message, optional, tag="3")]
-    pub token: ::core::option::Option<super::super::super::super::cosmos::base::v1beta1::Coin>,
-    /// the sender address
-    #[prost(string, tag="4")]
-    pub sender: ::prost::alloc::string::String,
-    /// the recipient address on the destination chain
-    #[prost(string, tag="5")]
-    pub receiver: ::prost::alloc::string::String,
-    /// Timeout height relative to the current block height.
-    /// The timeout is disabled when set to 0.
-    #[prost(message, optional, tag="6")]
-    pub timeout_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
-    /// Timeout timestamp in absolute nanoseconds since unix epoch.
-    /// The timeout is disabled when set to 0.
-    #[prost(uint64, tag="7")]
-    pub timeout_timestamp: u64,
+    pub allowance: ::core::option::Option<super::super::super::google::protobuf::Any>,
 }
-/// MsgTransferResponse defines the Msg/Transfer response type.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response type.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgTransferResponse {
+pub struct MsgGrantAllowanceResponse {
+}
+/// MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRevokeAllowance {
+    /// granter is the address of the user granting an allowance of their funds.
+    #[prost(string, tag="1")]
+    pub granter: ::prost::alloc::string::String,
+    /// grantee is the address of the user being granted an allowance of another user's funds.
+    #[prost(string, tag="2")]
+    pub grantee: ::prost::alloc::string::String,
+}
+/// MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse response type.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRevokeAllowanceResponse {
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -39,7 +36,7 @@ pub mod msg_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// Msg defines the ibc/transfer Msg service.
+    /// Msg defines the feegrant msg service.
     #[derive(Debug, Clone)]
     pub struct MsgClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -104,11 +101,12 @@ pub mod msg_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// Transfer defines a rpc handler method for MsgTransfer.
-        pub async fn transfer(
+        /// GrantAllowance grants fee allowance to the grantee on the granter's
+        /// account with the provided expiration time.
+        pub async fn grant_allowance(
             &mut self,
-            request: impl tonic::IntoRequest<super::MsgTransfer>,
-        ) -> Result<tonic::Response<super::MsgTransferResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::MsgGrantAllowance>,
+        ) -> Result<tonic::Response<super::MsgGrantAllowanceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -120,7 +118,28 @@ pub mod msg_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Msg/Transfer",
+                "/cosmos.feegrant.v1beta1.Msg/GrantAllowance",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// RevokeAllowance revokes any fee allowance of granter's account that
+        /// has been granted to the grantee.
+        pub async fn revoke_allowance(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MsgRevokeAllowance>,
+        ) -> Result<tonic::Response<super::MsgRevokeAllowanceResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/cosmos.feegrant.v1beta1.Msg/RevokeAllowance",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -134,13 +153,20 @@ pub mod msg_server {
     ///Generated trait containing gRPC methods that should be implemented for use with MsgServer.
     #[async_trait]
     pub trait Msg: Send + Sync + 'static {
-        /// Transfer defines a rpc handler method for MsgTransfer.
-        async fn transfer(
+        /// GrantAllowance grants fee allowance to the grantee on the granter's
+        /// account with the provided expiration time.
+        async fn grant_allowance(
             &self,
-            request: tonic::Request<super::MsgTransfer>,
-        ) -> Result<tonic::Response<super::MsgTransferResponse>, tonic::Status>;
+            request: tonic::Request<super::MsgGrantAllowance>,
+        ) -> Result<tonic::Response<super::MsgGrantAllowanceResponse>, tonic::Status>;
+        /// RevokeAllowance revokes any fee allowance of granter's account that
+        /// has been granted to the grantee.
+        async fn revoke_allowance(
+            &self,
+            request: tonic::Request<super::MsgRevokeAllowance>,
+        ) -> Result<tonic::Response<super::MsgRevokeAllowanceResponse>, tonic::Status>;
     }
-    /// Msg defines the ibc/transfer Msg service.
+    /// Msg defines the feegrant msg service.
     #[derive(Debug)]
     pub struct MsgServer<T: Msg> {
         inner: _Inner<T>,
@@ -200,22 +226,24 @@ pub mod msg_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/ibc.applications.transfer.v1.Msg/Transfer" => {
+                "/cosmos.feegrant.v1beta1.Msg/GrantAllowance" => {
                     #[allow(non_camel_case_types)]
-                    struct TransferSvc<T: Msg>(pub Arc<T>);
-                    impl<T: Msg> tonic::server::UnaryService<super::MsgTransfer>
-                    for TransferSvc<T> {
-                        type Response = super::MsgTransferResponse;
+                    struct GrantAllowanceSvc<T: Msg>(pub Arc<T>);
+                    impl<T: Msg> tonic::server::UnaryService<super::MsgGrantAllowance>
+                    for GrantAllowanceSvc<T> {
+                        type Response = super::MsgGrantAllowanceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MsgTransfer>,
+                            request: tonic::Request<super::MsgGrantAllowance>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).transfer(request).await };
+                            let fut = async move {
+                                (*inner).grant_allowance(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -224,7 +252,45 @@ pub mod msg_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = TransferSvc(inner);
+                        let method = GrantAllowanceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/cosmos.feegrant.v1beta1.Msg/RevokeAllowance" => {
+                    #[allow(non_camel_case_types)]
+                    struct RevokeAllowanceSvc<T: Msg>(pub Arc<T>);
+                    impl<T: Msg> tonic::server::UnaryService<super::MsgRevokeAllowance>
+                    for RevokeAllowanceSvc<T> {
+                        type Response = super::MsgRevokeAllowanceResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::MsgRevokeAllowance>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).revoke_allowance(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RevokeAllowanceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -272,126 +338,127 @@ pub mod msg_server {
         }
     }
     impl<T: Msg> tonic::server::NamedService for MsgServer<T> {
-        const NAME: &'static str = "ibc.applications.transfer.v1.Msg";
+        const NAME: &'static str = "cosmos.feegrant.v1beta1.Msg";
     }
 }
-/// DenomTrace contains the base denomination for ICS20 fungible tokens and the
-/// source tracing information path.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// BasicAllowance implements Allowance with a one-time grant of coins
+/// that optionally expires. The grantee can use up to SpendLimit to cover fees.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DenomTrace {
-    /// path defines the chain of port/channel identifiers used for tracing the
-    /// source of the fungible token.
-    #[prost(string, tag="1")]
-    pub path: ::prost::alloc::string::String,
-    /// base denomination of the relayed fungible token.
-    #[prost(string, tag="2")]
-    pub base_denom: ::prost::alloc::string::String,
-}
-/// Params defines the set of IBC transfer parameters.
-/// NOTE: To prevent a single token from being transferred, set the
-/// TransfersEnabled parameter to true and then set the bank module's SendEnabled
-/// parameter for the denomination to false.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Params {
-    /// send_enabled enables or disables all cross-chain token transfers from this
-    /// chain.
-    #[prost(bool, tag="1")]
-    pub send_enabled: bool,
-    /// receive_enabled enables or disables all cross-chain token transfers to this
-    /// chain.
-    #[prost(bool, tag="2")]
-    pub receive_enabled: bool,
-}
-/// QueryDenomTraceRequest is the request type for the Query/DenomTrace RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTraceRequest {
-    /// hash (in hex format) or denom (full denom with ibc prefix) of the denomination trace information.
-    #[prost(string, tag="1")]
-    pub hash: ::prost::alloc::string::String,
-}
-/// QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTraceResponse {
-    /// denom_trace returns the requested denomination trace information.
-    #[prost(message, optional, tag="1")]
-    pub denom_trace: ::core::option::Option<DenomTrace>,
-}
-/// QueryConnectionsRequest is the request type for the Query/DenomTraces RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTracesRequest {
-    /// pagination defines an optional pagination for the request.
-    #[prost(message, optional, tag="1")]
-    pub pagination: ::core::option::Option<super::super::super::super::cosmos::base::query::v1beta1::PageRequest>,
-}
-/// QueryConnectionsResponse is the response type for the Query/DenomTraces RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTracesResponse {
-    /// denom_traces returns all denominations trace information.
+pub struct BasicAllowance {
+    /// spend_limit specifies the maximum amount of coins that can be spent
+    /// by this allowance and will be updated as coins are spent. If it is
+    /// empty, there is no spend limit and any amount of coins can be spent.
     #[prost(message, repeated, tag="1")]
-    pub denom_traces: ::prost::alloc::vec::Vec<DenomTrace>,
-    /// pagination defines the pagination in the response.
+    pub spend_limit: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
+    /// expiration specifies an optional time when this allowance expires
     #[prost(message, optional, tag="2")]
-    pub pagination: ::core::option::Option<super::super::super::super::cosmos::base::query::v1beta1::PageResponse>,
+    pub expiration: ::core::option::Option<super::super::super::google::protobuf::Timestamp>,
 }
-/// QueryParamsRequest is the request type for the Query/Params RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// PeriodicAllowance extends Allowance to allow for both a maximum cap,
+/// as well as a limit per time period.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryParamsRequest {
-}
-/// QueryParamsResponse is the response type for the Query/Params RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryParamsResponse {
-    /// params defines the parameters of the module.
+pub struct PeriodicAllowance {
+    /// basic specifies a struct of `BasicAllowance`
     #[prost(message, optional, tag="1")]
-    pub params: ::core::option::Option<Params>,
+    pub basic: ::core::option::Option<BasicAllowance>,
+    /// period specifies the time duration in which period_spend_limit coins can
+    /// be spent before that allowance is reset
+    #[prost(message, optional, tag="2")]
+    pub period: ::core::option::Option<super::super::super::google::protobuf::Duration>,
+    /// period_spend_limit specifies the maximum number of coins that can be spent
+    /// in the period
+    #[prost(message, repeated, tag="3")]
+    pub period_spend_limit: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
+    /// period_can_spend is the number of coins left to be spent before the period_reset time
+    #[prost(message, repeated, tag="4")]
+    pub period_can_spend: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
+    /// period_reset is the time at which this period resets and a new one begins,
+    /// it is calculated from the start time of the first transaction after the
+    /// last period ended
+    #[prost(message, optional, tag="5")]
+    pub period_reset: ::core::option::Option<super::super::super::google::protobuf::Timestamp>,
 }
-/// QueryDenomHashRequest is the request type for the Query/DenomHash RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// AllowedMsgAllowance creates allowance only for specified message types.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomHashRequest {
-    /// The denomination trace (\[port_id]/[channel_id])+/[denom\]
-    #[prost(string, tag="1")]
-    pub trace: ::prost::alloc::string::String,
+pub struct AllowedMsgAllowance {
+    /// allowance can be any of basic and periodic fee allowance.
+    #[prost(message, optional, tag="1")]
+    pub allowance: ::core::option::Option<super::super::super::google::protobuf::Any>,
+    /// allowed_messages are the messages for which the grantee has the access.
+    #[prost(string, repeated, tag="2")]
+    pub allowed_messages: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
-/// QueryDenomHashResponse is the response type for the Query/DenomHash RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// Grant is stored in the KVStore to record a grant with full context
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomHashResponse {
-    /// hash (in hex format) of the denomination trace information.
+pub struct Grant {
+    /// granter is the address of the user granting an allowance of their funds.
     #[prost(string, tag="1")]
-    pub hash: ::prost::alloc::string::String,
-}
-/// QueryEscrowAddressRequest is the request type for the EscrowAddress RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryEscrowAddressRequest {
-    /// unique port identifier
-    #[prost(string, tag="1")]
-    pub port_id: ::prost::alloc::string::String,
-    /// unique channel identifier
+    pub granter: ::prost::alloc::string::String,
+    /// grantee is the address of the user being granted an allowance of another user's funds.
     #[prost(string, tag="2")]
-    pub channel_id: ::prost::alloc::string::String,
+    pub grantee: ::prost::alloc::string::String,
+    /// allowance can be any of basic, periodic, allowed fee allowance.
+    #[prost(message, optional, tag="3")]
+    pub allowance: ::core::option::Option<super::super::super::google::protobuf::Any>,
 }
-/// QueryEscrowAddressResponse is the response type of the EscrowAddress RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QueryAllowanceRequest is the request type for the Query/Allowance RPC method.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryEscrowAddressResponse {
-    /// the escrow account address
+pub struct QueryAllowanceRequest {
+    /// granter is the address of the user granting an allowance of their funds.
     #[prost(string, tag="1")]
-    pub escrow_address: ::prost::alloc::string::String,
+    pub granter: ::prost::alloc::string::String,
+    /// grantee is the address of the user being granted an allowance of another user's funds.
+    #[prost(string, tag="2")]
+    pub grantee: ::prost::alloc::string::String,
+}
+/// QueryAllowanceResponse is the response type for the Query/Allowance RPC method.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryAllowanceResponse {
+    /// allowance is a allowance granted for grantee by granter.
+    #[prost(message, optional, tag="1")]
+    pub allowance: ::core::option::Option<Grant>,
+}
+/// QueryAllowancesRequest is the request type for the Query/Allowances RPC method.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryAllowancesRequest {
+    #[prost(string, tag="1")]
+    pub grantee: ::prost::alloc::string::String,
+    /// pagination defines an pagination for the request.
+    #[prost(message, optional, tag="2")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageRequest>,
+}
+/// QueryAllowancesResponse is the response type for the Query/Allowances RPC method.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryAllowancesResponse {
+    /// allowances are allowance's granted for grantee by granter.
+    #[prost(message, repeated, tag="1")]
+    pub allowances: ::prost::alloc::vec::Vec<Grant>,
+    /// pagination defines an pagination for the response.
+    #[prost(message, optional, tag="2")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageResponse>,
+}
+/// QueryAllowancesByGranterRequest is the request type for the Query/AllowancesByGranter RPC method.
+///
+/// Since: cosmos-sdk 0.46
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryAllowancesByGranterRequest {
+    #[prost(string, tag="1")]
+    pub granter: ::prost::alloc::string::String,
+    /// pagination defines an pagination for the request.
+    #[prost(message, optional, tag="2")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageRequest>,
+}
+/// QueryAllowancesByGranterResponse is the response type for the Query/AllowancesByGranter RPC method.
+///
+/// Since: cosmos-sdk 0.46
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryAllowancesByGranterResponse {
+    /// allowances that have been issued by the granter.
+    #[prost(message, repeated, tag="1")]
+    pub allowances: ::prost::alloc::vec::Vec<Grant>,
+    /// pagination defines an pagination for the response.
+    #[prost(message, optional, tag="2")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageResponse>,
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -399,7 +466,7 @@ pub mod query_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// Query provides defines the gRPC querier service.
+    /// Query defines the gRPC querier service.
     #[derive(Debug, Clone)]
     pub struct QueryClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -464,11 +531,11 @@ pub mod query_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// DenomTrace queries a denomination trace information.
-        pub async fn denom_trace(
+        /// Allowance returns fee granted to the grantee by the granter.
+        pub async fn allowance(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomTraceRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTraceResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryAllowanceRequest>,
+        ) -> Result<tonic::Response<super::QueryAllowanceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -480,15 +547,15 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomTrace",
+                "/cosmos.feegrant.v1beta1.Query/Allowance",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// DenomTraces queries all denomination traces.
-        pub async fn denom_traces(
+        /// Allowances returns all the grants for address.
+        pub async fn allowances(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomTracesRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTracesResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryAllowancesRequest>,
+        ) -> Result<tonic::Response<super::QueryAllowancesResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -500,15 +567,20 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomTraces",
+                "/cosmos.feegrant.v1beta1.Query/Allowances",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// Params queries all parameters of the ibc-transfer module.
-        pub async fn params(
+        /// AllowancesByGranter returns all the grants given by an address
+        ///
+        /// Since: cosmos-sdk 0.46
+        pub async fn allowances_by_granter(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryParamsRequest>,
-        ) -> Result<tonic::Response<super::QueryParamsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryAllowancesByGranterRequest>,
+        ) -> Result<
+            tonic::Response<super::QueryAllowancesByGranterResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -520,47 +592,7 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/Params",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// DenomHash queries a denomination hash information.
-        pub async fn denom_hash(
-            &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomHashRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomHashResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomHash",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// EscrowAddress returns the escrow address for a particular port and channel id.
-        pub async fn escrow_address(
-            &mut self,
-            request: impl tonic::IntoRequest<super::QueryEscrowAddressRequest>,
-        ) -> Result<tonic::Response<super::QueryEscrowAddressResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/EscrowAddress",
+                "/cosmos.feegrant.v1beta1.Query/AllowancesByGranter",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -574,33 +606,28 @@ pub mod query_server {
     ///Generated trait containing gRPC methods that should be implemented for use with QueryServer.
     #[async_trait]
     pub trait Query: Send + Sync + 'static {
-        /// DenomTrace queries a denomination trace information.
-        async fn denom_trace(
+        /// Allowance returns fee granted to the grantee by the granter.
+        async fn allowance(
             &self,
-            request: tonic::Request<super::QueryDenomTraceRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTraceResponse>, tonic::Status>;
-        /// DenomTraces queries all denomination traces.
-        async fn denom_traces(
+            request: tonic::Request<super::QueryAllowanceRequest>,
+        ) -> Result<tonic::Response<super::QueryAllowanceResponse>, tonic::Status>;
+        /// Allowances returns all the grants for address.
+        async fn allowances(
             &self,
-            request: tonic::Request<super::QueryDenomTracesRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTracesResponse>, tonic::Status>;
-        /// Params queries all parameters of the ibc-transfer module.
-        async fn params(
+            request: tonic::Request<super::QueryAllowancesRequest>,
+        ) -> Result<tonic::Response<super::QueryAllowancesResponse>, tonic::Status>;
+        /// AllowancesByGranter returns all the grants given by an address
+        ///
+        /// Since: cosmos-sdk 0.46
+        async fn allowances_by_granter(
             &self,
-            request: tonic::Request<super::QueryParamsRequest>,
-        ) -> Result<tonic::Response<super::QueryParamsResponse>, tonic::Status>;
-        /// DenomHash queries a denomination hash information.
-        async fn denom_hash(
-            &self,
-            request: tonic::Request<super::QueryDenomHashRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomHashResponse>, tonic::Status>;
-        /// EscrowAddress returns the escrow address for a particular port and channel id.
-        async fn escrow_address(
-            &self,
-            request: tonic::Request<super::QueryEscrowAddressRequest>,
-        ) -> Result<tonic::Response<super::QueryEscrowAddressResponse>, tonic::Status>;
+            request: tonic::Request<super::QueryAllowancesByGranterRequest>,
+        ) -> Result<
+            tonic::Response<super::QueryAllowancesByGranterResponse>,
+            tonic::Status,
+        >;
     }
-    /// Query provides defines the gRPC querier service.
+    /// Query defines the gRPC querier service.
     #[derive(Debug)]
     pub struct QueryServer<T: Query> {
         inner: _Inner<T>,
@@ -660,24 +687,24 @@ pub mod query_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/ibc.applications.transfer.v1.Query/DenomTrace" => {
+                "/cosmos.feegrant.v1beta1.Query/Allowance" => {
                     #[allow(non_camel_case_types)]
-                    struct DenomTraceSvc<T: Query>(pub Arc<T>);
+                    struct AllowanceSvc<T: Query>(pub Arc<T>);
                     impl<
                         T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomTraceRequest>
-                    for DenomTraceSvc<T> {
-                        type Response = super::QueryDenomTraceResponse;
+                    > tonic::server::UnaryService<super::QueryAllowanceRequest>
+                    for AllowanceSvc<T> {
+                        type Response = super::QueryAllowanceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryDenomTraceRequest>,
+                            request: tonic::Request<super::QueryAllowanceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).denom_trace(request).await };
+                            let fut = async move { (*inner).allowance(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -686,7 +713,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DenomTraceSvc(inner);
+                        let method = AllowanceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -698,25 +725,65 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/DenomTraces" => {
+                "/cosmos.feegrant.v1beta1.Query/Allowances" => {
                     #[allow(non_camel_case_types)]
-                    struct DenomTracesSvc<T: Query>(pub Arc<T>);
+                    struct AllowancesSvc<T: Query>(pub Arc<T>);
                     impl<
                         T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomTracesRequest>
-                    for DenomTracesSvc<T> {
-                        type Response = super::QueryDenomTracesResponse;
+                    > tonic::server::UnaryService<super::QueryAllowancesRequest>
+                    for AllowancesSvc<T> {
+                        type Response = super::QueryAllowancesResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryDenomTracesRequest>,
+                            request: tonic::Request<super::QueryAllowancesRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).allowances(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AllowancesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/cosmos.feegrant.v1beta1.Query/AllowancesByGranter" => {
+                    #[allow(non_camel_case_types)]
+                    struct AllowancesByGranterSvc<T: Query>(pub Arc<T>);
+                    impl<
+                        T: Query,
+                    > tonic::server::UnaryService<super::QueryAllowancesByGranterRequest>
+                    for AllowancesByGranterSvc<T> {
+                        type Response = super::QueryAllowancesByGranterResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::QueryAllowancesByGranterRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).denom_traces(request).await
+                                (*inner).allowances_by_granter(request).await
                             };
                             Box::pin(fut)
                         }
@@ -726,121 +793,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DenomTracesSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/ibc.applications.transfer.v1.Query/Params" => {
-                    #[allow(non_camel_case_types)]
-                    struct ParamsSvc<T: Query>(pub Arc<T>);
-                    impl<T: Query> tonic::server::UnaryService<super::QueryParamsRequest>
-                    for ParamsSvc<T> {
-                        type Response = super::QueryParamsResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::QueryParamsRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).params(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = ParamsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/ibc.applications.transfer.v1.Query/DenomHash" => {
-                    #[allow(non_camel_case_types)]
-                    struct DenomHashSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomHashRequest>
-                    for DenomHashSvc<T> {
-                        type Response = super::QueryDenomHashResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::QueryDenomHashRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).denom_hash(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = DenomHashSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/ibc.applications.transfer.v1.Query/EscrowAddress" => {
-                    #[allow(non_camel_case_types)]
-                    struct EscrowAddressSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryEscrowAddressRequest>
-                    for EscrowAddressSvc<T> {
-                        type Response = super::QueryEscrowAddressResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::QueryEscrowAddressRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).escrow_address(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = EscrowAddressSvc(inner);
+                        let method = AllowancesByGranterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -888,17 +841,12 @@ pub mod query_server {
         }
     }
     impl<T: Query> tonic::server::NamedService for QueryServer<T> {
-        const NAME: &'static str = "ibc.applications.transfer.v1.Query";
+        const NAME: &'static str = "cosmos.feegrant.v1beta1.Query";
     }
 }
-/// GenesisState defines the ibc-transfer genesis state
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// GenesisState contains a set of fee allowances, persisted from the store
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GenesisState {
-    #[prost(string, tag="1")]
-    pub port_id: ::prost::alloc::string::String,
-    #[prost(message, repeated, tag="2")]
-    pub denom_traces: ::prost::alloc::vec::Vec<DenomTrace>,
-    #[prost(message, optional, tag="3")]
-    pub params: ::core::option::Option<Params>,
+    #[prost(message, repeated, tag="1")]
+    pub allowances: ::prost::alloc::vec::Vec<Grant>,
 }

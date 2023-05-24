@@ -114,7 +114,7 @@ mkdir -p src/prost
 
 cd tools/proto-compiler
 
-cargo build --locked
+cargo build
 
 # Run the proto-compiler twice,
 # once for std version with --build-tonic set to true

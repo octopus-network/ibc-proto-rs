@@ -1,37 +1,12 @@
-/// MsgTransfer defines a msg to transfer fungible tokens (i.e Coins) between
-/// ICS20 enabled chains. See ICS Spec here:
-/// <https://github.com/cosmos/ibc/tree/master/spec/app/ics-020-fungible-token-transfer#data-structures>
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// MsgUnjail defines the Msg/Unjail request type
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgTransfer {
-    /// the port on which the packet will be sent
+pub struct MsgUnjail {
     #[prost(string, tag="1")]
-    pub source_port: ::prost::alloc::string::String,
-    /// the channel by which the packet will be sent
-    #[prost(string, tag="2")]
-    pub source_channel: ::prost::alloc::string::String,
-    /// the tokens to be transferred
-    #[prost(message, optional, tag="3")]
-    pub token: ::core::option::Option<super::super::super::super::cosmos::base::v1beta1::Coin>,
-    /// the sender address
-    #[prost(string, tag="4")]
-    pub sender: ::prost::alloc::string::String,
-    /// the recipient address on the destination chain
-    #[prost(string, tag="5")]
-    pub receiver: ::prost::alloc::string::String,
-    /// Timeout height relative to the current block height.
-    /// The timeout is disabled when set to 0.
-    #[prost(message, optional, tag="6")]
-    pub timeout_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
-    /// Timeout timestamp in absolute nanoseconds since unix epoch.
-    /// The timeout is disabled when set to 0.
-    #[prost(uint64, tag="7")]
-    pub timeout_timestamp: u64,
+    pub validator_addr: ::prost::alloc::string::String,
 }
-/// MsgTransferResponse defines the Msg/Transfer response type.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// MsgUnjailResponse defines the Msg/Unjail response type
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgTransferResponse {
+pub struct MsgUnjailResponse {
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -39,7 +14,7 @@ pub mod msg_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// Msg defines the ibc/transfer Msg service.
+    /// Msg defines the slashing Msg service.
     #[derive(Debug, Clone)]
     pub struct MsgClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -104,11 +79,13 @@ pub mod msg_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// Transfer defines a rpc handler method for MsgTransfer.
-        pub async fn transfer(
+        /// Unjail defines a method for unjailing a jailed validator, thus returning
+        /// them into the bonded validator set, so they can begin receiving provisions
+        /// and rewards again.
+        pub async fn unjail(
             &mut self,
-            request: impl tonic::IntoRequest<super::MsgTransfer>,
-        ) -> Result<tonic::Response<super::MsgTransferResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::MsgUnjail>,
+        ) -> Result<tonic::Response<super::MsgUnjailResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -120,7 +97,7 @@ pub mod msg_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Msg/Transfer",
+                "/cosmos.slashing.v1beta1.Msg/Unjail",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -134,13 +111,15 @@ pub mod msg_server {
     ///Generated trait containing gRPC methods that should be implemented for use with MsgServer.
     #[async_trait]
     pub trait Msg: Send + Sync + 'static {
-        /// Transfer defines a rpc handler method for MsgTransfer.
-        async fn transfer(
+        /// Unjail defines a method for unjailing a jailed validator, thus returning
+        /// them into the bonded validator set, so they can begin receiving provisions
+        /// and rewards again.
+        async fn unjail(
             &self,
-            request: tonic::Request<super::MsgTransfer>,
-        ) -> Result<tonic::Response<super::MsgTransferResponse>, tonic::Status>;
+            request: tonic::Request<super::MsgUnjail>,
+        ) -> Result<tonic::Response<super::MsgUnjailResponse>, tonic::Status>;
     }
-    /// Msg defines the ibc/transfer Msg service.
+    /// Msg defines the slashing Msg service.
     #[derive(Debug)]
     pub struct MsgServer<T: Msg> {
         inner: _Inner<T>,
@@ -200,22 +179,22 @@ pub mod msg_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/ibc.applications.transfer.v1.Msg/Transfer" => {
+                "/cosmos.slashing.v1beta1.Msg/Unjail" => {
                     #[allow(non_camel_case_types)]
-                    struct TransferSvc<T: Msg>(pub Arc<T>);
-                    impl<T: Msg> tonic::server::UnaryService<super::MsgTransfer>
-                    for TransferSvc<T> {
-                        type Response = super::MsgTransferResponse;
+                    struct UnjailSvc<T: Msg>(pub Arc<T>);
+                    impl<T: Msg> tonic::server::UnaryService<super::MsgUnjail>
+                    for UnjailSvc<T> {
+                        type Response = super::MsgUnjailResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MsgTransfer>,
+                            request: tonic::Request<super::MsgUnjail>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).transfer(request).await };
+                            let fut = async move { (*inner).unjail(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -224,7 +203,7 @@ pub mod msg_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = TransferSvc(inner);
+                        let method = UnjailSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -272,126 +251,91 @@ pub mod msg_server {
         }
     }
     impl<T: Msg> tonic::server::NamedService for MsgServer<T> {
-        const NAME: &'static str = "ibc.applications.transfer.v1.Msg";
+        const NAME: &'static str = "cosmos.slashing.v1beta1.Msg";
     }
 }
-/// DenomTrace contains the base denomination for ICS20 fungible tokens and the
-/// source tracing information path.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// ValidatorSigningInfo defines a validator's signing info for monitoring their
+/// liveness activity.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DenomTrace {
-    /// path defines the chain of port/channel identifiers used for tracing the
-    /// source of the fungible token.
+pub struct ValidatorSigningInfo {
     #[prost(string, tag="1")]
-    pub path: ::prost::alloc::string::String,
-    /// base denomination of the relayed fungible token.
-    #[prost(string, tag="2")]
-    pub base_denom: ::prost::alloc::string::String,
+    pub address: ::prost::alloc::string::String,
+    /// Height at which validator was first a candidate OR was unjailed
+    #[prost(int64, tag="2")]
+    pub start_height: i64,
+    /// Index which is incremented each time the validator was a bonded
+    /// in a block and may have signed a precommit or not. This in conjunction with the
+    /// `SignedBlocksWindow` param determines the index in the `MissedBlocksBitArray`.
+    #[prost(int64, tag="3")]
+    pub index_offset: i64,
+    /// Timestamp until which the validator is jailed due to liveness downtime.
+    #[prost(message, optional, tag="4")]
+    pub jailed_until: ::core::option::Option<super::super::super::google::protobuf::Timestamp>,
+    /// Whether or not a validator has been tombstoned (killed out of validator set). It is set
+    /// once the validator commits an equivocation or for any other configured misbehiavor.
+    #[prost(bool, tag="5")]
+    pub tombstoned: bool,
+    /// A counter kept to avoid unnecessary array reads.
+    /// Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
+    #[prost(int64, tag="6")]
+    pub missed_blocks_counter: i64,
 }
-/// Params defines the set of IBC transfer parameters.
-/// NOTE: To prevent a single token from being transferred, set the
-/// TransfersEnabled parameter to true and then set the bank module's SendEnabled
-/// parameter for the denomination to false.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// Params represents the parameters used for by the slashing module.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Params {
-    /// send_enabled enables or disables all cross-chain token transfers from this
-    /// chain.
-    #[prost(bool, tag="1")]
-    pub send_enabled: bool,
-    /// receive_enabled enables or disables all cross-chain token transfers to this
-    /// chain.
-    #[prost(bool, tag="2")]
-    pub receive_enabled: bool,
+    #[prost(int64, tag="1")]
+    pub signed_blocks_window: i64,
+    #[prost(bytes="vec", tag="2")]
+    pub min_signed_per_window: ::prost::alloc::vec::Vec<u8>,
+    #[prost(message, optional, tag="3")]
+    pub downtime_jail_duration: ::core::option::Option<super::super::super::google::protobuf::Duration>,
+    #[prost(bytes="vec", tag="4")]
+    pub slash_fraction_double_sign: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="5")]
+    pub slash_fraction_downtime: ::prost::alloc::vec::Vec<u8>,
 }
-/// QueryDenomTraceRequest is the request type for the Query/DenomTrace RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTraceRequest {
-    /// hash (in hex format) or denom (full denom with ibc prefix) of the denomination trace information.
-    #[prost(string, tag="1")]
-    pub hash: ::prost::alloc::string::String,
-}
-/// QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTraceResponse {
-    /// denom_trace returns the requested denomination trace information.
-    #[prost(message, optional, tag="1")]
-    pub denom_trace: ::core::option::Option<DenomTrace>,
-}
-/// QueryConnectionsRequest is the request type for the Query/DenomTraces RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTracesRequest {
-    /// pagination defines an optional pagination for the request.
-    #[prost(message, optional, tag="1")]
-    pub pagination: ::core::option::Option<super::super::super::super::cosmos::base::query::v1beta1::PageRequest>,
-}
-/// QueryConnectionsResponse is the response type for the Query/DenomTraces RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTracesResponse {
-    /// denom_traces returns all denominations trace information.
-    #[prost(message, repeated, tag="1")]
-    pub denom_traces: ::prost::alloc::vec::Vec<DenomTrace>,
-    /// pagination defines the pagination in the response.
-    #[prost(message, optional, tag="2")]
-    pub pagination: ::core::option::Option<super::super::super::super::cosmos::base::query::v1beta1::PageResponse>,
-}
-/// QueryParamsRequest is the request type for the Query/Params RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QueryParamsRequest is the request type for the Query/Params RPC method
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryParamsRequest {
 }
-/// QueryParamsResponse is the response type for the Query/Params RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QueryParamsResponse is the response type for the Query/Params RPC method
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryParamsResponse {
-    /// params defines the parameters of the module.
     #[prost(message, optional, tag="1")]
     pub params: ::core::option::Option<Params>,
 }
-/// QueryDenomHashRequest is the request type for the Query/DenomHash RPC
+/// QuerySigningInfoRequest is the request type for the Query/SigningInfo RPC
 /// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomHashRequest {
-    /// The denomination trace (\[port_id]/[channel_id])+/[denom\]
+pub struct QuerySigningInfoRequest {
+    /// cons_address is the address to query signing info of
     #[prost(string, tag="1")]
-    pub trace: ::prost::alloc::string::String,
+    pub cons_address: ::prost::alloc::string::String,
 }
-/// QueryDenomHashResponse is the response type for the Query/DenomHash RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
+/// method
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomHashResponse {
-    /// hash (in hex format) of the denomination trace information.
-    #[prost(string, tag="1")]
-    pub hash: ::prost::alloc::string::String,
+pub struct QuerySigningInfoResponse {
+    /// val_signing_info is the signing info of requested val cons address
+    #[prost(message, optional, tag="1")]
+    pub val_signing_info: ::core::option::Option<ValidatorSigningInfo>,
 }
-/// QueryEscrowAddressRequest is the request type for the EscrowAddress RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QuerySigningInfosRequest is the request type for the Query/SigningInfos RPC
+/// method
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryEscrowAddressRequest {
-    /// unique port identifier
-    #[prost(string, tag="1")]
-    pub port_id: ::prost::alloc::string::String,
-    /// unique channel identifier
-    #[prost(string, tag="2")]
-    pub channel_id: ::prost::alloc::string::String,
+pub struct QuerySigningInfosRequest {
+    #[prost(message, optional, tag="1")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageRequest>,
 }
-/// QueryEscrowAddressResponse is the response type of the EscrowAddress RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QuerySigningInfosResponse is the response type for the Query/SigningInfos RPC
+/// method
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryEscrowAddressResponse {
-    /// the escrow account address
-    #[prost(string, tag="1")]
-    pub escrow_address: ::prost::alloc::string::String,
+pub struct QuerySigningInfosResponse {
+    /// info is the signing info of all validators
+    #[prost(message, repeated, tag="1")]
+    pub info: ::prost::alloc::vec::Vec<ValidatorSigningInfo>,
+    #[prost(message, optional, tag="2")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageResponse>,
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -399,7 +343,7 @@ pub mod query_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// Query provides defines the gRPC querier service.
+    /// Query provides defines the gRPC querier service
     #[derive(Debug, Clone)]
     pub struct QueryClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -464,47 +408,7 @@ pub mod query_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// DenomTrace queries a denomination trace information.
-        pub async fn denom_trace(
-            &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomTraceRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTraceResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomTrace",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// DenomTraces queries all denomination traces.
-        pub async fn denom_traces(
-            &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomTracesRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTracesResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomTraces",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// Params queries all parameters of the ibc-transfer module.
+        /// Params queries the parameters of slashing module
         pub async fn params(
             &mut self,
             request: impl tonic::IntoRequest<super::QueryParamsRequest>,
@@ -520,15 +424,15 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/Params",
+                "/cosmos.slashing.v1beta1.Query/Params",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// DenomHash queries a denomination hash information.
-        pub async fn denom_hash(
+        /// SigningInfo queries the signing info of given cons address
+        pub async fn signing_info(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomHashRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomHashResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QuerySigningInfoRequest>,
+        ) -> Result<tonic::Response<super::QuerySigningInfoResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -540,15 +444,15 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomHash",
+                "/cosmos.slashing.v1beta1.Query/SigningInfo",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// EscrowAddress returns the escrow address for a particular port and channel id.
-        pub async fn escrow_address(
+        /// SigningInfos queries signing info of all validators
+        pub async fn signing_infos(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryEscrowAddressRequest>,
-        ) -> Result<tonic::Response<super::QueryEscrowAddressResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QuerySigningInfosRequest>,
+        ) -> Result<tonic::Response<super::QuerySigningInfosResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -560,7 +464,7 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/EscrowAddress",
+                "/cosmos.slashing.v1beta1.Query/SigningInfos",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -574,33 +478,23 @@ pub mod query_server {
     ///Generated trait containing gRPC methods that should be implemented for use with QueryServer.
     #[async_trait]
     pub trait Query: Send + Sync + 'static {
-        /// DenomTrace queries a denomination trace information.
-        async fn denom_trace(
-            &self,
-            request: tonic::Request<super::QueryDenomTraceRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTraceResponse>, tonic::Status>;
-        /// DenomTraces queries all denomination traces.
-        async fn denom_traces(
-            &self,
-            request: tonic::Request<super::QueryDenomTracesRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTracesResponse>, tonic::Status>;
-        /// Params queries all parameters of the ibc-transfer module.
+        /// Params queries the parameters of slashing module
         async fn params(
             &self,
             request: tonic::Request<super::QueryParamsRequest>,
         ) -> Result<tonic::Response<super::QueryParamsResponse>, tonic::Status>;
-        /// DenomHash queries a denomination hash information.
-        async fn denom_hash(
+        /// SigningInfo queries the signing info of given cons address
+        async fn signing_info(
             &self,
-            request: tonic::Request<super::QueryDenomHashRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomHashResponse>, tonic::Status>;
-        /// EscrowAddress returns the escrow address for a particular port and channel id.
-        async fn escrow_address(
+            request: tonic::Request<super::QuerySigningInfoRequest>,
+        ) -> Result<tonic::Response<super::QuerySigningInfoResponse>, tonic::Status>;
+        /// SigningInfos queries signing info of all validators
+        async fn signing_infos(
             &self,
-            request: tonic::Request<super::QueryEscrowAddressRequest>,
-        ) -> Result<tonic::Response<super::QueryEscrowAddressResponse>, tonic::Status>;
+            request: tonic::Request<super::QuerySigningInfosRequest>,
+        ) -> Result<tonic::Response<super::QuerySigningInfosResponse>, tonic::Status>;
     }
-    /// Query provides defines the gRPC querier service.
+    /// Query provides defines the gRPC querier service
     #[derive(Debug)]
     pub struct QueryServer<T: Query> {
         inner: _Inner<T>,
@@ -660,85 +554,7 @@ pub mod query_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/ibc.applications.transfer.v1.Query/DenomTrace" => {
-                    #[allow(non_camel_case_types)]
-                    struct DenomTraceSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomTraceRequest>
-                    for DenomTraceSvc<T> {
-                        type Response = super::QueryDenomTraceResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::QueryDenomTraceRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).denom_trace(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = DenomTraceSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/ibc.applications.transfer.v1.Query/DenomTraces" => {
-                    #[allow(non_camel_case_types)]
-                    struct DenomTracesSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomTracesRequest>
-                    for DenomTracesSvc<T> {
-                        type Response = super::QueryDenomTracesResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::QueryDenomTracesRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).denom_traces(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = DenomTracesSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/ibc.applications.transfer.v1.Query/Params" => {
+                "/cosmos.slashing.v1beta1.Query/Params" => {
                     #[allow(non_camel_case_types)]
                     struct ParamsSvc<T: Query>(pub Arc<T>);
                     impl<T: Query> tonic::server::UnaryService<super::QueryParamsRequest>
@@ -774,24 +590,26 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/DenomHash" => {
+                "/cosmos.slashing.v1beta1.Query/SigningInfo" => {
                     #[allow(non_camel_case_types)]
-                    struct DenomHashSvc<T: Query>(pub Arc<T>);
+                    struct SigningInfoSvc<T: Query>(pub Arc<T>);
                     impl<
                         T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomHashRequest>
-                    for DenomHashSvc<T> {
-                        type Response = super::QueryDenomHashResponse;
+                    > tonic::server::UnaryService<super::QuerySigningInfoRequest>
+                    for SigningInfoSvc<T> {
+                        type Response = super::QuerySigningInfoResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryDenomHashRequest>,
+                            request: tonic::Request<super::QuerySigningInfoRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).denom_hash(request).await };
+                            let fut = async move {
+                                (*inner).signing_info(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -800,7 +618,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DenomHashSvc(inner);
+                        let method = SigningInfoSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -812,25 +630,25 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/EscrowAddress" => {
+                "/cosmos.slashing.v1beta1.Query/SigningInfos" => {
                     #[allow(non_camel_case_types)]
-                    struct EscrowAddressSvc<T: Query>(pub Arc<T>);
+                    struct SigningInfosSvc<T: Query>(pub Arc<T>);
                     impl<
                         T: Query,
-                    > tonic::server::UnaryService<super::QueryEscrowAddressRequest>
-                    for EscrowAddressSvc<T> {
-                        type Response = super::QueryEscrowAddressResponse;
+                    > tonic::server::UnaryService<super::QuerySigningInfosRequest>
+                    for SigningInfosSvc<T> {
+                        type Response = super::QuerySigningInfosResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryEscrowAddressRequest>,
+                            request: tonic::Request<super::QuerySigningInfosRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).escrow_address(request).await
+                                (*inner).signing_infos(request).await
                             };
                             Box::pin(fut)
                         }
@@ -840,7 +658,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = EscrowAddressSvc(inner);
+                        let method = SigningInfosSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -888,17 +706,52 @@ pub mod query_server {
         }
     }
     impl<T: Query> tonic::server::NamedService for QueryServer<T> {
-        const NAME: &'static str = "ibc.applications.transfer.v1.Query";
+        const NAME: &'static str = "cosmos.slashing.v1beta1.Query";
     }
 }
-/// GenesisState defines the ibc-transfer genesis state
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// GenesisState defines the slashing module's genesis state.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GenesisState {
-    #[prost(string, tag="1")]
-    pub port_id: ::prost::alloc::string::String,
-    #[prost(message, repeated, tag="2")]
-    pub denom_traces: ::prost::alloc::vec::Vec<DenomTrace>,
-    #[prost(message, optional, tag="3")]
+    /// params defines all the paramaters of related to deposit.
+    #[prost(message, optional, tag="1")]
     pub params: ::core::option::Option<Params>,
+    /// signing_infos represents a map between validator addresses and their
+    /// signing infos.
+    #[prost(message, repeated, tag="2")]
+    pub signing_infos: ::prost::alloc::vec::Vec<SigningInfo>,
+    /// missed_blocks represents a map between validator addresses and their
+    /// missed blocks.
+    #[prost(message, repeated, tag="3")]
+    pub missed_blocks: ::prost::alloc::vec::Vec<ValidatorMissedBlocks>,
+}
+/// SigningInfo stores validator signing info of corresponding address.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SigningInfo {
+    /// address is the validator address.
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    /// validator_signing_info represents the signing info of this validator.
+    #[prost(message, optional, tag="2")]
+    pub validator_signing_info: ::core::option::Option<ValidatorSigningInfo>,
+}
+/// ValidatorMissedBlocks contains array of missed blocks of corresponding
+/// address.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ValidatorMissedBlocks {
+    /// address is the validator address.
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    /// missed_blocks is an array of missed blocks by the validator.
+    #[prost(message, repeated, tag="2")]
+    pub missed_blocks: ::prost::alloc::vec::Vec<MissedBlock>,
+}
+/// MissedBlock contains height and missed status as boolean.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MissedBlock {
+    /// index is the height at which the block was missed.
+    #[prost(int64, tag="1")]
+    pub index: i64,
+    /// missed is the missed status.
+    #[prost(bool, tag="2")]
+    pub missed: bool,
 }

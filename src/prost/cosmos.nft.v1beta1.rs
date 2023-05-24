@@ -1,37 +1,22 @@
-/// MsgTransfer defines a msg to transfer fungible tokens (i.e Coins) between
-/// ICS20 enabled chains. See ICS Spec here:
-/// <https://github.com/cosmos/ibc/tree/master/spec/app/ics-020-fungible-token-transfer#data-structures>
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// MsgSend represents a message to send a nft from one account to another account.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgTransfer {
-    /// the port on which the packet will be sent
+pub struct MsgSend {
+    /// class_id defines the unique identifier of the nft classification, similar to the contract address of ERC721
     #[prost(string, tag="1")]
-    pub source_port: ::prost::alloc::string::String,
-    /// the channel by which the packet will be sent
+    pub class_id: ::prost::alloc::string::String,
+    /// id defines the unique identification of nft
     #[prost(string, tag="2")]
-    pub source_channel: ::prost::alloc::string::String,
-    /// the tokens to be transferred
-    #[prost(message, optional, tag="3")]
-    pub token: ::core::option::Option<super::super::super::super::cosmos::base::v1beta1::Coin>,
-    /// the sender address
-    #[prost(string, tag="4")]
+    pub id: ::prost::alloc::string::String,
+    /// sender is the address of the owner of nft
+    #[prost(string, tag="3")]
     pub sender: ::prost::alloc::string::String,
-    /// the recipient address on the destination chain
-    #[prost(string, tag="5")]
+    /// receiver is the receiver address of nft
+    #[prost(string, tag="4")]
     pub receiver: ::prost::alloc::string::String,
-    /// Timeout height relative to the current block height.
-    /// The timeout is disabled when set to 0.
-    #[prost(message, optional, tag="6")]
-    pub timeout_height: ::core::option::Option<super::super::super::core::client::v1::Height>,
-    /// Timeout timestamp in absolute nanoseconds since unix epoch.
-    /// The timeout is disabled when set to 0.
-    #[prost(uint64, tag="7")]
-    pub timeout_timestamp: u64,
 }
-/// MsgTransferResponse defines the Msg/Transfer response type.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// MsgSendResponse defines the Msg/Send response type.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgTransferResponse {
+pub struct MsgSendResponse {
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -39,7 +24,7 @@ pub mod msg_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// Msg defines the ibc/transfer Msg service.
+    /// Msg defines the nft Msg service.
     #[derive(Debug, Clone)]
     pub struct MsgClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -104,11 +89,11 @@ pub mod msg_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// Transfer defines a rpc handler method for MsgTransfer.
-        pub async fn transfer(
+        /// Send defines a method to send a nft from one account to another account.
+        pub async fn send(
             &mut self,
-            request: impl tonic::IntoRequest<super::MsgTransfer>,
-        ) -> Result<tonic::Response<super::MsgTransferResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::MsgSend>,
+        ) -> Result<tonic::Response<super::MsgSendResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -120,7 +105,7 @@ pub mod msg_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Msg/Transfer",
+                "/cosmos.nft.v1beta1.Msg/Send",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -134,13 +119,13 @@ pub mod msg_server {
     ///Generated trait containing gRPC methods that should be implemented for use with MsgServer.
     #[async_trait]
     pub trait Msg: Send + Sync + 'static {
-        /// Transfer defines a rpc handler method for MsgTransfer.
-        async fn transfer(
+        /// Send defines a method to send a nft from one account to another account.
+        async fn send(
             &self,
-            request: tonic::Request<super::MsgTransfer>,
-        ) -> Result<tonic::Response<super::MsgTransferResponse>, tonic::Status>;
+            request: tonic::Request<super::MsgSend>,
+        ) -> Result<tonic::Response<super::MsgSendResponse>, tonic::Status>;
     }
-    /// Msg defines the ibc/transfer Msg service.
+    /// Msg defines the nft Msg service.
     #[derive(Debug)]
     pub struct MsgServer<T: Msg> {
         inner: _Inner<T>,
@@ -200,22 +185,22 @@ pub mod msg_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/ibc.applications.transfer.v1.Msg/Transfer" => {
+                "/cosmos.nft.v1beta1.Msg/Send" => {
                     #[allow(non_camel_case_types)]
-                    struct TransferSvc<T: Msg>(pub Arc<T>);
-                    impl<T: Msg> tonic::server::UnaryService<super::MsgTransfer>
-                    for TransferSvc<T> {
-                        type Response = super::MsgTransferResponse;
+                    struct SendSvc<T: Msg>(pub Arc<T>);
+                    impl<T: Msg> tonic::server::UnaryService<super::MsgSend>
+                    for SendSvc<T> {
+                        type Response = super::MsgSendResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MsgTransfer>,
+                            request: tonic::Request<super::MsgSend>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).transfer(request).await };
+                            let fut = async move { (*inner).send(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -224,7 +209,7 @@ pub mod msg_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = TransferSvc(inner);
+                        let method = SendSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -272,126 +257,151 @@ pub mod msg_server {
         }
     }
     impl<T: Msg> tonic::server::NamedService for MsgServer<T> {
-        const NAME: &'static str = "ibc.applications.transfer.v1.Msg";
+        const NAME: &'static str = "cosmos.nft.v1beta1.Msg";
     }
 }
-/// DenomTrace contains the base denomination for ICS20 fungible tokens and the
-/// source tracing information path.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// Class defines the class of the nft type.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DenomTrace {
-    /// path defines the chain of port/channel identifiers used for tracing the
-    /// source of the fungible token.
+pub struct Class {
+    /// id defines the unique identifier of the NFT classification, similar to the contract address of ERC721
     #[prost(string, tag="1")]
-    pub path: ::prost::alloc::string::String,
-    /// base denomination of the relayed fungible token.
+    pub id: ::prost::alloc::string::String,
+    /// name defines the human-readable name of the NFT classification. Optional
     #[prost(string, tag="2")]
-    pub base_denom: ::prost::alloc::string::String,
+    pub name: ::prost::alloc::string::String,
+    /// symbol is an abbreviated name for nft classification. Optional
+    #[prost(string, tag="3")]
+    pub symbol: ::prost::alloc::string::String,
+    /// description is a brief description of nft classification. Optional
+    #[prost(string, tag="4")]
+    pub description: ::prost::alloc::string::String,
+    /// uri for the class metadata stored off chain. It can define schema for Class and NFT `Data` attributes. Optional
+    #[prost(string, tag="5")]
+    pub uri: ::prost::alloc::string::String,
+    /// uri_hash is a hash of the document pointed by uri. Optional
+    #[prost(string, tag="6")]
+    pub uri_hash: ::prost::alloc::string::String,
+    /// data is the app specific metadata of the NFT class. Optional
+    #[prost(message, optional, tag="7")]
+    pub data: ::core::option::Option<super::super::super::google::protobuf::Any>,
 }
-/// Params defines the set of IBC transfer parameters.
-/// NOTE: To prevent a single token from being transferred, set the
-/// TransfersEnabled parameter to true and then set the bank module's SendEnabled
-/// parameter for the denomination to false.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// NFT defines the NFT.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Params {
-    /// send_enabled enables or disables all cross-chain token transfers from this
-    /// chain.
-    #[prost(bool, tag="1")]
-    pub send_enabled: bool,
-    /// receive_enabled enables or disables all cross-chain token transfers to this
-    /// chain.
-    #[prost(bool, tag="2")]
-    pub receive_enabled: bool,
-}
-/// QueryDenomTraceRequest is the request type for the Query/DenomTrace RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTraceRequest {
-    /// hash (in hex format) or denom (full denom with ibc prefix) of the denomination trace information.
+pub struct Nft {
+    /// class_id associated with the NFT, similar to the contract address of ERC721
     #[prost(string, tag="1")]
-    pub hash: ::prost::alloc::string::String,
+    pub class_id: ::prost::alloc::string::String,
+    /// id is a unique identifier of the NFT
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+    /// uri for the NFT metadata stored off chain
+    #[prost(string, tag="3")]
+    pub uri: ::prost::alloc::string::String,
+    /// uri_hash is a hash of the document pointed by uri
+    #[prost(string, tag="4")]
+    pub uri_hash: ::prost::alloc::string::String,
+    /// data is an app specific data of the NFT. Optional
+    #[prost(message, optional, tag="10")]
+    pub data: ::core::option::Option<super::super::super::google::protobuf::Any>,
 }
-/// QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QueryBalanceRequest is the request type for the Query/Balance RPC method
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTraceResponse {
-    /// denom_trace returns the requested denomination trace information.
+pub struct QueryBalanceRequest {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub owner: ::prost::alloc::string::String,
+}
+/// QueryBalanceResponse is the response type for the Query/Balance RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryBalanceResponse {
+    #[prost(uint64, tag="1")]
+    pub amount: u64,
+}
+/// QueryOwnerRequest is the request type for the Query/Owner RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryOwnerRequest {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+}
+/// QueryOwnerResponse is the response type for the Query/Owner RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryOwnerResponse {
+    #[prost(string, tag="1")]
+    pub owner: ::prost::alloc::string::String,
+}
+/// QuerySupplyRequest is the request type for the Query/Supply RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QuerySupplyRequest {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+}
+/// QuerySupplyResponse is the response type for the Query/Supply RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QuerySupplyResponse {
+    #[prost(uint64, tag="1")]
+    pub amount: u64,
+}
+/// QueryNFTstRequest is the request type for the Query/NFTs RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryNfTsRequest {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub owner: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageRequest>,
+}
+/// QueryNFTsResponse is the response type for the Query/NFTs RPC methods
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryNfTsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub nfts: ::prost::alloc::vec::Vec<Nft>,
+    #[prost(message, optional, tag="2")]
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageResponse>,
+}
+/// QueryNFTRequest is the request type for the Query/NFT RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryNftRequest {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+}
+/// QueryNFTResponse is the response type for the Query/NFT RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryNftResponse {
     #[prost(message, optional, tag="1")]
-    pub denom_trace: ::core::option::Option<DenomTrace>,
+    pub nft: ::core::option::Option<Nft>,
 }
-/// QueryConnectionsRequest is the request type for the Query/DenomTraces RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QueryClassRequest is the request type for the Query/Class RPC method
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTracesRequest {
+pub struct QueryClassRequest {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+}
+/// QueryClassResponse is the response type for the Query/Class RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryClassResponse {
+    #[prost(message, optional, tag="1")]
+    pub class: ::core::option::Option<Class>,
+}
+/// QueryClassesRequest is the request type for the Query/Classes RPC method
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryClassesRequest {
     /// pagination defines an optional pagination for the request.
     #[prost(message, optional, tag="1")]
-    pub pagination: ::core::option::Option<super::super::super::super::cosmos::base::query::v1beta1::PageRequest>,
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageRequest>,
 }
-/// QueryConnectionsResponse is the response type for the Query/DenomTraces RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// QueryClassesResponse is the response type for the Query/Classes RPC method
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomTracesResponse {
-    /// denom_traces returns all denominations trace information.
+pub struct QueryClassesResponse {
     #[prost(message, repeated, tag="1")]
-    pub denom_traces: ::prost::alloc::vec::Vec<DenomTrace>,
-    /// pagination defines the pagination in the response.
+    pub classes: ::prost::alloc::vec::Vec<Class>,
     #[prost(message, optional, tag="2")]
-    pub pagination: ::core::option::Option<super::super::super::super::cosmos::base::query::v1beta1::PageResponse>,
-}
-/// QueryParamsRequest is the request type for the Query/Params RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryParamsRequest {
-}
-/// QueryParamsResponse is the response type for the Query/Params RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryParamsResponse {
-    /// params defines the parameters of the module.
-    #[prost(message, optional, tag="1")]
-    pub params: ::core::option::Option<Params>,
-}
-/// QueryDenomHashRequest is the request type for the Query/DenomHash RPC
-/// method
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomHashRequest {
-    /// The denomination trace (\[port_id]/[channel_id])+/[denom\]
-    #[prost(string, tag="1")]
-    pub trace: ::prost::alloc::string::String,
-}
-/// QueryDenomHashResponse is the response type for the Query/DenomHash RPC
-/// method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryDenomHashResponse {
-    /// hash (in hex format) of the denomination trace information.
-    #[prost(string, tag="1")]
-    pub hash: ::prost::alloc::string::String,
-}
-/// QueryEscrowAddressRequest is the request type for the EscrowAddress RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryEscrowAddressRequest {
-    /// unique port identifier
-    #[prost(string, tag="1")]
-    pub port_id: ::prost::alloc::string::String,
-    /// unique channel identifier
-    #[prost(string, tag="2")]
-    pub channel_id: ::prost::alloc::string::String,
-}
-/// QueryEscrowAddressResponse is the response type of the EscrowAddress RPC method.
-#[derive(::serde::Serialize, ::serde::Deserialize)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryEscrowAddressResponse {
-    /// the escrow account address
-    #[prost(string, tag="1")]
-    pub escrow_address: ::prost::alloc::string::String,
+    pub pagination: ::core::option::Option<super::super::base::query::v1beta1::PageResponse>,
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -399,7 +409,7 @@ pub mod query_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// Query provides defines the gRPC querier service.
+    /// Query defines the gRPC querier service.
     #[derive(Debug, Clone)]
     pub struct QueryClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -464,11 +474,11 @@ pub mod query_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// DenomTrace queries a denomination trace information.
-        pub async fn denom_trace(
+        /// Balance queries the number of NFTs of a given class owned by the owner, same as balanceOf in ERC721
+        pub async fn balance(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomTraceRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTraceResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryBalanceRequest>,
+        ) -> Result<tonic::Response<super::QueryBalanceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -480,15 +490,15 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomTrace",
+                "/cosmos.nft.v1beta1.Query/Balance",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// DenomTraces queries all denomination traces.
-        pub async fn denom_traces(
+        /// Owner queries the owner of the NFT based on its class and id, same as ownerOf in ERC721
+        pub async fn owner(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomTracesRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTracesResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryOwnerRequest>,
+        ) -> Result<tonic::Response<super::QueryOwnerResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -500,15 +510,15 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomTraces",
+                "/cosmos.nft.v1beta1.Query/Owner",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// Params queries all parameters of the ibc-transfer module.
-        pub async fn params(
+        /// Supply queries the number of NFTs from the given class, same as totalSupply of ERC721.
+        pub async fn supply(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryParamsRequest>,
-        ) -> Result<tonic::Response<super::QueryParamsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QuerySupplyRequest>,
+        ) -> Result<tonic::Response<super::QuerySupplyResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -520,15 +530,16 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/Params",
+                "/cosmos.nft.v1beta1.Query/Supply",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// DenomHash queries a denomination hash information.
-        pub async fn denom_hash(
+        /// NFTs queries all NFTs of a given class or owner,choose at least one of the two, similar to tokenByIndex in
+        /// ERC721Enumerable
+        pub async fn nf_ts(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryDenomHashRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomHashResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryNfTsRequest>,
+        ) -> Result<tonic::Response<super::QueryNfTsResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -540,15 +551,15 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/DenomHash",
+                "/cosmos.nft.v1beta1.Query/NFTs",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// EscrowAddress returns the escrow address for a particular port and channel id.
-        pub async fn escrow_address(
+        /// NFT queries an NFT based on its class and id.
+        pub async fn nft(
             &mut self,
-            request: impl tonic::IntoRequest<super::QueryEscrowAddressRequest>,
-        ) -> Result<tonic::Response<super::QueryEscrowAddressResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::QueryNftRequest>,
+        ) -> Result<tonic::Response<super::QueryNftResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -560,7 +571,47 @@ pub mod query_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/ibc.applications.transfer.v1.Query/EscrowAddress",
+                "/cosmos.nft.v1beta1.Query/NFT",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// Class queries an NFT class based on its id
+        pub async fn class(
+            &mut self,
+            request: impl tonic::IntoRequest<super::QueryClassRequest>,
+        ) -> Result<tonic::Response<super::QueryClassResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/cosmos.nft.v1beta1.Query/Class",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// Classes queries all NFT classes
+        pub async fn classes(
+            &mut self,
+            request: impl tonic::IntoRequest<super::QueryClassesRequest>,
+        ) -> Result<tonic::Response<super::QueryClassesResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/cosmos.nft.v1beta1.Query/Classes",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -574,33 +625,44 @@ pub mod query_server {
     ///Generated trait containing gRPC methods that should be implemented for use with QueryServer.
     #[async_trait]
     pub trait Query: Send + Sync + 'static {
-        /// DenomTrace queries a denomination trace information.
-        async fn denom_trace(
+        /// Balance queries the number of NFTs of a given class owned by the owner, same as balanceOf in ERC721
+        async fn balance(
             &self,
-            request: tonic::Request<super::QueryDenomTraceRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTraceResponse>, tonic::Status>;
-        /// DenomTraces queries all denomination traces.
-        async fn denom_traces(
+            request: tonic::Request<super::QueryBalanceRequest>,
+        ) -> Result<tonic::Response<super::QueryBalanceResponse>, tonic::Status>;
+        /// Owner queries the owner of the NFT based on its class and id, same as ownerOf in ERC721
+        async fn owner(
             &self,
-            request: tonic::Request<super::QueryDenomTracesRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomTracesResponse>, tonic::Status>;
-        /// Params queries all parameters of the ibc-transfer module.
-        async fn params(
+            request: tonic::Request<super::QueryOwnerRequest>,
+        ) -> Result<tonic::Response<super::QueryOwnerResponse>, tonic::Status>;
+        /// Supply queries the number of NFTs from the given class, same as totalSupply of ERC721.
+        async fn supply(
             &self,
-            request: tonic::Request<super::QueryParamsRequest>,
-        ) -> Result<tonic::Response<super::QueryParamsResponse>, tonic::Status>;
-        /// DenomHash queries a denomination hash information.
-        async fn denom_hash(
+            request: tonic::Request<super::QuerySupplyRequest>,
+        ) -> Result<tonic::Response<super::QuerySupplyResponse>, tonic::Status>;
+        /// NFTs queries all NFTs of a given class or owner,choose at least one of the two, similar to tokenByIndex in
+        /// ERC721Enumerable
+        async fn nf_ts(
             &self,
-            request: tonic::Request<super::QueryDenomHashRequest>,
-        ) -> Result<tonic::Response<super::QueryDenomHashResponse>, tonic::Status>;
-        /// EscrowAddress returns the escrow address for a particular port and channel id.
-        async fn escrow_address(
+            request: tonic::Request<super::QueryNfTsRequest>,
+        ) -> Result<tonic::Response<super::QueryNfTsResponse>, tonic::Status>;
+        /// NFT queries an NFT based on its class and id.
+        async fn nft(
             &self,
-            request: tonic::Request<super::QueryEscrowAddressRequest>,
-        ) -> Result<tonic::Response<super::QueryEscrowAddressResponse>, tonic::Status>;
+            request: tonic::Request<super::QueryNftRequest>,
+        ) -> Result<tonic::Response<super::QueryNftResponse>, tonic::Status>;
+        /// Class queries an NFT class based on its id
+        async fn class(
+            &self,
+            request: tonic::Request<super::QueryClassRequest>,
+        ) -> Result<tonic::Response<super::QueryClassResponse>, tonic::Status>;
+        /// Classes queries all NFT classes
+        async fn classes(
+            &self,
+            request: tonic::Request<super::QueryClassesRequest>,
+        ) -> Result<tonic::Response<super::QueryClassesResponse>, tonic::Status>;
     }
-    /// Query provides defines the gRPC querier service.
+    /// Query defines the gRPC querier service.
     #[derive(Debug)]
     pub struct QueryServer<T: Query> {
         inner: _Inner<T>,
@@ -660,24 +722,24 @@ pub mod query_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/ibc.applications.transfer.v1.Query/DenomTrace" => {
+                "/cosmos.nft.v1beta1.Query/Balance" => {
                     #[allow(non_camel_case_types)]
-                    struct DenomTraceSvc<T: Query>(pub Arc<T>);
+                    struct BalanceSvc<T: Query>(pub Arc<T>);
                     impl<
                         T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomTraceRequest>
-                    for DenomTraceSvc<T> {
-                        type Response = super::QueryDenomTraceResponse;
+                    > tonic::server::UnaryService<super::QueryBalanceRequest>
+                    for BalanceSvc<T> {
+                        type Response = super::QueryBalanceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryDenomTraceRequest>,
+                            request: tonic::Request<super::QueryBalanceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).denom_trace(request).await };
+                            let fut = async move { (*inner).balance(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -686,7 +748,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DenomTraceSvc(inner);
+                        let method = BalanceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -698,26 +760,22 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/DenomTraces" => {
+                "/cosmos.nft.v1beta1.Query/Owner" => {
                     #[allow(non_camel_case_types)]
-                    struct DenomTracesSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomTracesRequest>
-                    for DenomTracesSvc<T> {
-                        type Response = super::QueryDenomTracesResponse;
+                    struct OwnerSvc<T: Query>(pub Arc<T>);
+                    impl<T: Query> tonic::server::UnaryService<super::QueryOwnerRequest>
+                    for OwnerSvc<T> {
+                        type Response = super::QueryOwnerResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryDenomTracesRequest>,
+                            request: tonic::Request<super::QueryOwnerRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).denom_traces(request).await
-                            };
+                            let fut = async move { (*inner).owner(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -726,7 +784,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DenomTracesSvc(inner);
+                        let method = OwnerSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -738,22 +796,22 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/Params" => {
+                "/cosmos.nft.v1beta1.Query/Supply" => {
                     #[allow(non_camel_case_types)]
-                    struct ParamsSvc<T: Query>(pub Arc<T>);
-                    impl<T: Query> tonic::server::UnaryService<super::QueryParamsRequest>
-                    for ParamsSvc<T> {
-                        type Response = super::QueryParamsResponse;
+                    struct SupplySvc<T: Query>(pub Arc<T>);
+                    impl<T: Query> tonic::server::UnaryService<super::QuerySupplyRequest>
+                    for SupplySvc<T> {
+                        type Response = super::QuerySupplyResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryParamsRequest>,
+                            request: tonic::Request<super::QuerySupplyRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).params(request).await };
+                            let fut = async move { (*inner).supply(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -762,7 +820,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = ParamsSvc(inner);
+                        let method = SupplySvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -774,24 +832,22 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/DenomHash" => {
+                "/cosmos.nft.v1beta1.Query/NFTs" => {
                     #[allow(non_camel_case_types)]
-                    struct DenomHashSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryDenomHashRequest>
-                    for DenomHashSvc<T> {
-                        type Response = super::QueryDenomHashResponse;
+                    struct NFTsSvc<T: Query>(pub Arc<T>);
+                    impl<T: Query> tonic::server::UnaryService<super::QueryNfTsRequest>
+                    for NFTsSvc<T> {
+                        type Response = super::QueryNfTsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryDenomHashRequest>,
+                            request: tonic::Request<super::QueryNfTsRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).denom_hash(request).await };
+                            let fut = async move { (*inner).nf_ts(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -800,7 +856,7 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DenomHashSvc(inner);
+                        let method = NFTsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -812,26 +868,22 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
-                "/ibc.applications.transfer.v1.Query/EscrowAddress" => {
+                "/cosmos.nft.v1beta1.Query/NFT" => {
                     #[allow(non_camel_case_types)]
-                    struct EscrowAddressSvc<T: Query>(pub Arc<T>);
-                    impl<
-                        T: Query,
-                    > tonic::server::UnaryService<super::QueryEscrowAddressRequest>
-                    for EscrowAddressSvc<T> {
-                        type Response = super::QueryEscrowAddressResponse;
+                    struct NFTSvc<T: Query>(pub Arc<T>);
+                    impl<T: Query> tonic::server::UnaryService<super::QueryNftRequest>
+                    for NFTSvc<T> {
+                        type Response = super::QueryNftResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::QueryEscrowAddressRequest>,
+                            request: tonic::Request<super::QueryNftRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).escrow_address(request).await
-                            };
+                            let fut = async move { (*inner).nft(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -840,7 +892,81 @@ pub mod query_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = EscrowAddressSvc(inner);
+                        let method = NFTSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/cosmos.nft.v1beta1.Query/Class" => {
+                    #[allow(non_camel_case_types)]
+                    struct ClassSvc<T: Query>(pub Arc<T>);
+                    impl<T: Query> tonic::server::UnaryService<super::QueryClassRequest>
+                    for ClassSvc<T> {
+                        type Response = super::QueryClassResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::QueryClassRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).class(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ClassSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/cosmos.nft.v1beta1.Query/Classes" => {
+                    #[allow(non_camel_case_types)]
+                    struct ClassesSvc<T: Query>(pub Arc<T>);
+                    impl<
+                        T: Query,
+                    > tonic::server::UnaryService<super::QueryClassesRequest>
+                    for ClassesSvc<T> {
+                        type Response = super::QueryClassesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::QueryClassesRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).classes(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ClassesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -888,17 +1014,57 @@ pub mod query_server {
         }
     }
     impl<T: Query> tonic::server::NamedService for QueryServer<T> {
-        const NAME: &'static str = "ibc.applications.transfer.v1.Query";
+        const NAME: &'static str = "cosmos.nft.v1beta1.Query";
     }
 }
-/// GenesisState defines the ibc-transfer genesis state
-#[derive(::serde::Serialize, ::serde::Deserialize)]
+/// EventSend is emitted on Msg/Send
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventSend {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub sender: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub receiver: ::prost::alloc::string::String,
+}
+/// EventMint is emitted on Mint
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventMint {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub owner: ::prost::alloc::string::String,
+}
+/// EventBurn is emitted on Burn
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventBurn {
+    #[prost(string, tag="1")]
+    pub class_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub owner: ::prost::alloc::string::String,
+}
+/// GenesisState defines the nft module's genesis state.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GenesisState {
-    #[prost(string, tag="1")]
-    pub port_id: ::prost::alloc::string::String,
+    /// class defines the class of the nft type.
+    #[prost(message, repeated, tag="1")]
+    pub classes: ::prost::alloc::vec::Vec<Class>,
     #[prost(message, repeated, tag="2")]
-    pub denom_traces: ::prost::alloc::vec::Vec<DenomTrace>,
-    #[prost(message, optional, tag="3")]
-    pub params: ::core::option::Option<Params>,
+    pub entries: ::prost::alloc::vec::Vec<Entry>,
+}
+/// Entry Defines all nft owned by a person
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Entry {
+    /// owner is the owner address of the following nft
+    #[prost(string, tag="1")]
+    pub owner: ::prost::alloc::string::String,
+    /// nfts is a group of nfts of the same owner
+    #[prost(message, repeated, tag="2")]
+    pub nfts: ::prost::alloc::vec::Vec<Nft>,
 }

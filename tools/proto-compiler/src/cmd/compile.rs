@@ -65,13 +65,32 @@ impl CompileCmd {
             format!("{}/../../definitions/mock", root),
             format!("{}/../../definitions/stride/interchainquery/v1", root),
             format!("{}/ibc", ibc_dir.display()),
+            // cosmos sdk
+            format!("{}/cosmos/app", sdk_dir.display()),
             format!("{}/cosmos/auth", sdk_dir.display()),
-            format!("{}/cosmos/gov", sdk_dir.display()),
-            format!("{}/cosmos/tx", sdk_dir.display()),
-            format!("{}/cosmos/base", sdk_dir.display()),
+            format!("{}/cosmos/authz", sdk_dir.display()),
             format!("{}/cosmos/bank", sdk_dir.display()),
+            format!("{}/cosmos/base", sdk_dir.display()),
+            format!("{}/cosmos/capability", sdk_dir.display()),
+            format!("{}/cosmos/crisis", sdk_dir.display()),
+            format!("{}/cosmos/crypto", sdk_dir.display()),
+            format!("{}/cosmos/distribution", sdk_dir.display()),
+            format!("{}/cosmos/evidence", sdk_dir.display()),
+            format!("{}/cosmos/feegrant", sdk_dir.display()),
+            format!("{}/cosmos/genutil", sdk_dir.display()),
+            format!("{}/cosmos/gov", sdk_dir.display()),
+            format!("{}/cosmos/group", sdk_dir.display()),
+            format!("{}/cosmos/mint", sdk_dir.display()),
+            format!("{}/cosmos/msg", sdk_dir.display()),
+            format!("{}/cosmos/nft", sdk_dir.display()),
+            format!("{}/cosmos/orm", sdk_dir.display()),
+            format!("{}/cosmos/params", sdk_dir.display()),
+            format!("{}/cosmos/slashing", sdk_dir.display()),
             format!("{}/cosmos/staking", sdk_dir.display()),
+            format!("{}/cosmos/tx", sdk_dir.display()),
             format!("{}/cosmos/upgrade", sdk_dir.display()),
+            format!("{}/cosmos/vesting", sdk_dir.display()),
+            // ics
             format!("{}/interchain_security/ccv/v1", ics_dir.display()),
             format!("{}/interchain_security/ccv/provider", ics_dir.display()),
             format!("{}/interchain_security/ccv/consumer", ics_dir.display()),
@@ -131,6 +150,7 @@ impl CompileCmd {
             .server_mod_attribute(".", r#"#[cfg(feature = "server")]"#)
             .out_dir(out_dir)
             .extern_path(".tendermint", "::tendermint_proto")
+            .type_attribute(".cosmos.auth.v1beta1.BaseAccount", attrs_serde)
             .type_attribute(".google.protobuf.Any", attrs_serde)
             .type_attribute(".google.protobuf.Any", attrs_eq)
             .type_attribute(".google.protobuf.Timestamp", attrs_serde)
@@ -173,6 +193,7 @@ impl CompileCmd {
                 ".ibc.applications.interchain_accounts.controller.v1",
                 attrs_serde,
             )
+            .type_attribute(".ibc.applications.interchain_accounts.v1", attrs_serde)
             .type_attribute(".ics23", attrs_serde)
             .type_attribute(".ics23.LeafOp", attrs_eq)
             .type_attribute(".ics23.LeafOp", attrs_jsonschema)

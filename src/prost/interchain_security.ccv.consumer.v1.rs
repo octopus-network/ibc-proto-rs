@@ -2,7 +2,7 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Params {
-    /// TODO: Remove enabled flag and find a better way to setup e2e tests
+    /// TODO: Remove enabled flag and find a better way to setup integration tests
     /// See: <https://github.com/cosmos/interchain-security/issues/339>
     #[prost(bool, tag = "1")]
     pub enabled: bool,
@@ -47,6 +47,11 @@ pub struct Params {
     pub unbonding_period: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
     >,
+    /// The threshold for the percentage of validators at the bottom of the set who
+    /// can opt out of running the consumer chain without being punished. For example, a
+    /// value of 0.05 means that the validators in the bottom 5% of the set can opt out
+    #[prost(string, tag = "10")]
+    pub soft_opt_out_threshold: ::prost::alloc::string::String,
 }
 /// LastTransmissionBlockHeight is the last time validator holding
 /// pools were transmitted to the provider chain
@@ -130,6 +135,9 @@ pub struct GenesisState {
     pub last_transmission_block_height: ::core::option::Option<
         LastTransmissionBlockHeight,
     >,
+    /// flag indicating whether the consumer CCV module starts in pre-CCV state
+    #[prost(bool, tag = "13")]
+    pub pre_ccv: bool,
 }
 /// HeightValsetUpdateID defines the genesis information for the mapping
 /// of each block height to a valset update id

@@ -108,6 +108,12 @@ pub struct Validator {
     /// Since: cosmos-sdk 0.46
     #[prost(string, tag = "11")]
     pub min_self_delegation: ::prost::alloc::string::String,
+    /// strictly positive if this validator's unbonding has been stopped by external modules
+    #[prost(int64, tag = "12")]
+    pub unbonding_on_hold_ref_count: i64,
+    /// list of unbonding ids, each uniquely identifing an unbonding of this validator
+    #[prost(uint64, repeated, tag = "13")]
+    pub unbonding_ids: ::prost::alloc::vec::Vec<u64>,
 }
 /// ValAddresses defines a repeated set of validator addresses.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -206,6 +212,12 @@ pub struct UnbondingDelegationEntry {
     /// balance defines the tokens to receive at completion.
     #[prost(string, tag = "4")]
     pub balance: ::prost::alloc::string::String,
+    /// Incrementing id that uniquely identifies this entry
+    #[prost(uint64, tag = "5")]
+    pub unbonding_id: u64,
+    /// Strictly positive if this entry's unbonding has been stopped by external modules
+    #[prost(int64, tag = "6")]
+    pub unbonding_on_hold_ref_count: i64,
 }
 /// RedelegationEntry defines a redelegation object with relevant metadata.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -225,6 +237,12 @@ pub struct RedelegationEntry {
     /// shares_dst is the amount of destination-validator shares created by redelegation.
     #[prost(string, tag = "4")]
     pub shares_dst: ::prost::alloc::string::String,
+    /// Incrementing id that uniquely identifies this entry
+    #[prost(uint64, tag = "5")]
+    pub unbonding_id: u64,
+    /// Strictly positive if this entry's unbonding has been stopped by external modules
+    #[prost(int64, tag = "6")]
+    pub unbonding_on_hold_ref_count: i64,
 }
 /// Redelegation contains the list of a particular delegator's redelegating bonds
 /// from a particular source validator to a particular destination validator.
@@ -246,7 +264,7 @@ pub struct Redelegation {
     #[prost(message, repeated, tag = "4")]
     pub entries: ::prost::alloc::vec::Vec<RedelegationEntry>,
 }
-/// Params defines the parameters for the staking module.
+/// Params defines the parameters for the x/staking module.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Params {
@@ -314,6 +332,7 @@ pub struct Pool {
     pub bonded_tokens: ::prost::alloc::string::String,
 }
 /// ValidatorUpdates defines an array of abci.ValidatorUpdate objects.
+/// TODO: explore moving this to proto/cosmos/base to separate modules from tendermint dependence
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ValidatorUpdates {
@@ -357,35 +376,35 @@ impl BondStatus {
         }
     }
 }
-/// InfractionType indicates the infraction type a validator commited.
+/// Infraction indicates the infraction a validator commited.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
-pub enum InfractionType {
-    /// UNSPECIFIED defines an empty infraction type.
+pub enum Infraction {
+    /// UNSPECIFIED defines an empty infraction.
     Unspecified = 0,
     /// DOUBLE_SIGN defines a validator that double-signs a block.
     DoubleSign = 1,
     /// DOWNTIME defines a validator that missed signing too many blocks.
     Downtime = 2,
 }
-impl InfractionType {
+impl Infraction {
     /// String value of the enum field names used in the ProtoBuf definition.
     ///
     /// The values are not transformed in any way and thus are considered stable
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
-            InfractionType::Unspecified => "INFRACTION_TYPE_UNSPECIFIED",
-            InfractionType::DoubleSign => "INFRACTION_TYPE_DOUBLE_SIGN",
-            InfractionType::Downtime => "INFRACTION_TYPE_DOWNTIME",
+            Infraction::Unspecified => "INFRACTION_UNSPECIFIED",
+            Infraction::DoubleSign => "INFRACTION_DOUBLE_SIGN",
+            Infraction::Downtime => "INFRACTION_DOWNTIME",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
-            "INFRACTION_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
-            "INFRACTION_TYPE_DOUBLE_SIGN" => Some(Self::DoubleSign),
-            "INFRACTION_TYPE_DOWNTIME" => Some(Self::Downtime),
+            "INFRACTION_UNSPECIFIED" => Some(Self::Unspecified),
+            "INFRACTION_DOUBLE_SIGN" => Some(Self::DoubleSign),
+            "INFRACTION_DOWNTIME" => Some(Self::Downtime),
             _ => None,
         }
     }
@@ -517,6 +536,28 @@ pub struct MsgCancelUnbondingDelegation {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgCancelUnbondingDelegationResponse {}
+/// MsgUpdateParams is the Msg/UpdateParams request type.
+///
+/// Since: cosmos-sdk 0.47
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgUpdateParams {
+    /// authority is the address that controls the module (defaults to x/gov unless overwritten).
+    #[prost(string, tag = "1")]
+    pub authority: ::prost::alloc::string::String,
+    /// params defines the x/staking parameters to update.
+    ///
+    /// NOTE: All parameters must be supplied.
+    #[prost(message, optional, tag = "2")]
+    pub params: ::core::option::Option<Params>,
+}
+/// MsgUpdateParamsResponse defines the response structure for executing a
+/// MsgUpdateParams message.
+///
+/// Since: cosmos-sdk 0.47
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgUpdateParamsResponse {}
 /// Generated client implementations.
 #[cfg(feature = "client")]
 pub mod msg_client {
@@ -775,6 +816,34 @@ pub mod msg_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        /// UpdateParams defines an operation for updating the x/staking module
+        /// parameters.
+        /// Since: cosmos-sdk 0.47
+        pub async fn update_params(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MsgUpdateParams>,
+        ) -> std::result::Result<
+            tonic::Response<super::MsgUpdateParamsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/cosmos.staking.v1beta1.Msg/UpdateParams",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("cosmos.staking.v1beta1.Msg", "UpdateParams"));
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -837,6 +906,16 @@ pub mod msg_server {
             request: tonic::Request<super::MsgCancelUnbondingDelegation>,
         ) -> std::result::Result<
             tonic::Response<super::MsgCancelUnbondingDelegationResponse>,
+            tonic::Status,
+        >;
+        /// UpdateParams defines an operation for updating the x/staking module
+        /// parameters.
+        /// Since: cosmos-sdk 0.47
+        async fn update_params(
+            &self,
+            request: tonic::Request<super::MsgUpdateParams>,
+        ) -> std::result::Result<
+            tonic::Response<super::MsgUpdateParamsResponse>,
             tonic::Status,
         >;
     }
@@ -1167,6 +1246,50 @@ pub mod msg_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = CancelUnbondingDelegationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/cosmos.staking.v1beta1.Msg/UpdateParams" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateParamsSvc<T: Msg>(pub Arc<T>);
+                    impl<T: Msg> tonic::server::UnaryService<super::MsgUpdateParams>
+                    for UpdateParamsSvc<T> {
+                        type Response = super::MsgUpdateParamsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::MsgUpdateParams>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).update_params(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateParamsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1626,6 +1749,9 @@ pub mod query_client {
             self
         }
         /// Validators queries all validators that match the given status.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn validators(
             &mut self,
             request: impl tonic::IntoRequest<super::QueryValidatorsRequest>,
@@ -1678,6 +1804,9 @@ pub mod query_client {
             self.inner.unary(req, path, codec).await
         }
         /// ValidatorDelegations queries delegate info for given validator.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn validator_delegations(
             &mut self,
             request: impl tonic::IntoRequest<super::QueryValidatorDelegationsRequest>,
@@ -1709,6 +1838,9 @@ pub mod query_client {
             self.inner.unary(req, path, codec).await
         }
         /// ValidatorUnbondingDelegations queries unbonding delegations of a validator.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn validator_unbonding_delegations(
             &mut self,
             request: impl tonic::IntoRequest<
@@ -1800,6 +1932,9 @@ pub mod query_client {
             self.inner.unary(req, path, codec).await
         }
         /// DelegatorDelegations queries all delegations of a given delegator address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn delegator_delegations(
             &mut self,
             request: impl tonic::IntoRequest<super::QueryDelegatorDelegationsRequest>,
@@ -1832,6 +1967,9 @@ pub mod query_client {
         }
         /// DelegatorUnbondingDelegations queries all unbonding delegations of a given
         /// delegator address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn delegator_unbonding_delegations(
             &mut self,
             request: impl tonic::IntoRequest<
@@ -1865,6 +2003,9 @@ pub mod query_client {
             self.inner.unary(req, path, codec).await
         }
         /// Redelegations queries redelegations of given address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn redelegations(
             &mut self,
             request: impl tonic::IntoRequest<super::QueryRedelegationsRequest>,
@@ -1894,6 +2035,9 @@ pub mod query_client {
         }
         /// DelegatorValidators queries all validators info for given delegator
         /// address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         pub async fn delegator_validators(
             &mut self,
             request: impl tonic::IntoRequest<super::QueryDelegatorValidatorsRequest>,
@@ -2044,6 +2188,9 @@ pub mod query_server {
     #[async_trait]
     pub trait Query: Send + Sync + 'static {
         /// Validators queries all validators that match the given status.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn validators(
             &self,
             request: tonic::Request<super::QueryValidatorsRequest>,
@@ -2060,6 +2207,9 @@ pub mod query_server {
             tonic::Status,
         >;
         /// ValidatorDelegations queries delegate info for given validator.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn validator_delegations(
             &self,
             request: tonic::Request<super::QueryValidatorDelegationsRequest>,
@@ -2068,6 +2218,9 @@ pub mod query_server {
             tonic::Status,
         >;
         /// ValidatorUnbondingDelegations queries unbonding delegations of a validator.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn validator_unbonding_delegations(
             &self,
             request: tonic::Request<super::QueryValidatorUnbondingDelegationsRequest>,
@@ -2093,6 +2246,9 @@ pub mod query_server {
             tonic::Status,
         >;
         /// DelegatorDelegations queries all delegations of a given delegator address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn delegator_delegations(
             &self,
             request: tonic::Request<super::QueryDelegatorDelegationsRequest>,
@@ -2102,6 +2258,9 @@ pub mod query_server {
         >;
         /// DelegatorUnbondingDelegations queries all unbonding delegations of a given
         /// delegator address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn delegator_unbonding_delegations(
             &self,
             request: tonic::Request<super::QueryDelegatorUnbondingDelegationsRequest>,
@@ -2110,6 +2269,9 @@ pub mod query_server {
             tonic::Status,
         >;
         /// Redelegations queries redelegations of given address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn redelegations(
             &self,
             request: tonic::Request<super::QueryRedelegationsRequest>,
@@ -2119,6 +2281,9 @@ pub mod query_server {
         >;
         /// DelegatorValidators queries all validators info for given delegator
         /// address.
+        ///
+        /// When called from another module, this query might consume a high amount of
+        /// gas if the pagination field is incorrectly set.
         async fn delegator_validators(
             &self,
             request: tonic::Request<super::QueryDelegatorValidatorsRequest>,
@@ -3011,7 +3176,7 @@ impl AuthorizationType {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GenesisState {
-    /// params defines all the paramaters of related to deposit.
+    /// params defines all the parameters of related to deposit.
     #[prost(message, optional, tag = "1")]
     pub params: ::core::option::Option<Params>,
     /// last_total_power tracks the total amounts of bonded tokens recorded during

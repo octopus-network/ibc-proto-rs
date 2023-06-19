@@ -1,11 +1,18 @@
+/// A NEAR protocol validator stake view.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CryptoHash {
+    #[prost(bytes = "vec", tag = "1")]
+    pub raw_data: ::prost::alloc::vec::Vec<u8>,
+}
 /// A NEAR protocol consensus header.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Header {
     #[prost(bytes = "vec", tag = "1")]
     pub light_client_block: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes = "vec", tag = "2")]
-    pub prev_state_root_of_chunks: ::prost::alloc::vec::Vec<u8>,
+    #[prost(message, repeated, tag = "2")]
+    pub prev_state_root_of_chunks: ::prost::alloc::vec::Vec<CryptoHash>,
 }
 /// A NEAR protocol validator stake view.
 #[allow(clippy::derive_partial_eq_without_eq)]

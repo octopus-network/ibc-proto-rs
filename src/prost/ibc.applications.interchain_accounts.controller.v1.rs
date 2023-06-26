@@ -1,4 +1,4 @@
-/// MsgRegisterInterchainAccount defines the payload for Msg/MsgRegisterInterchainAccount
+/// MsgRegisterInterchainAccount defines the payload for Msg/RegisterAccount
 #[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -10,7 +10,7 @@ pub struct MsgRegisterInterchainAccount {
     #[prost(string, tag = "3")]
     pub version: ::prost::alloc::string::String,
 }
-/// MsgRegisterInterchainAccountResponse defines the response for Msg/MsgRegisterInterchainAccountResponse
+/// MsgRegisterInterchainAccountResponse defines the response for Msg/RegisterAccount
 #[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

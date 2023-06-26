@@ -198,7 +198,7 @@ pub struct MsgCreateClient {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgCreateClientResponse {}
 /// MsgUpdateClient defines an sdk.Msg to update a IBC client state using
-/// the given header.
+/// the given client message.
 #[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -206,9 +206,9 @@ pub struct MsgUpdateClient {
     /// client unique identifier
     #[prost(string, tag = "1")]
     pub client_id: ::prost::alloc::string::String,
-    /// header to update the light client
+    /// client message to update the light client
     #[prost(message, optional, tag = "2")]
-    pub header: ::core::option::Option<
+    pub client_message: ::core::option::Option<
         super::super::super::super::google::protobuf::Any,
     >,
     /// signer address
@@ -257,19 +257,23 @@ pub struct MsgUpgradeClient {
 pub struct MsgUpgradeClientResponse {}
 /// MsgSubmitMisbehaviour defines an sdk.Msg type that submits Evidence for
 /// light client misbehaviour.
+/// Warning: DEPRECATED
 #[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgSubmitMisbehaviour {
     /// client unique identifier
+    #[deprecated]
     #[prost(string, tag = "1")]
     pub client_id: ::prost::alloc::string::String,
     /// misbehaviour used for freezing the light client
+    #[deprecated]
     #[prost(message, optional, tag = "2")]
     pub misbehaviour: ::core::option::Option<
         super::super::super::super::google::protobuf::Any,
     >,
     /// signer address
+    #[deprecated]
     #[prost(string, tag = "3")]
     pub signer: ::prost::alloc::string::String,
 }

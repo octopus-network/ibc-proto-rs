@@ -961,8 +961,8 @@ pub mod uninterpreted_option {
     /// The name of the uninterpreted option.  Each string represents a segment in
     /// a dot-separated name.  is_extension is true iff a segment represents an
     /// extension (denoted with parentheses in options specs in .proto files).
-    /// E.g.,{ ["foo", false], ["bar.baz", true], ["moo", false] } represents
-    /// "foo.(bar.baz).moo".
+    /// E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
+    /// "foo.(bar.baz).qux".
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct NamePart {
@@ -1087,13 +1087,13 @@ pub mod source_code_info {
         ///    // Comment attached to baz.
         ///    // Another line attached to baz.
         ///
-        ///    // Comment attached to moo.
+        ///    // Comment attached to qux.
         ///    //
-        ///    // Another line attached to moo.
-        ///    optional double moo = 4;
+        ///    // Another line attached to qux.
+        ///    optional double qux = 4;
         ///
         ///    // Detached comment for corge. This is not leading or trailing comments
-        ///    // to moo or corge because there are blank lines separating it from
+        ///    // to qux or corge because there are blank lines separating it from
         ///    // both.
         ///
         ///    // Detached comment for corge paragraph 2.
@@ -1176,7 +1176,7 @@ pub mod generated_code_info {
 ///        foo = any.unpack(Foo.class);
 ///      }
 ///
-///   Example 3: Pack and unpack a message in Python.
+/// Example 3: Pack and unpack a message in Python.
 ///
 ///      foo = Foo(...)
 ///      any = Any()
@@ -1186,13 +1186,16 @@ pub mod generated_code_info {
 ///        any.Unpack(foo)
 ///        ...
 ///
-///   Example 4: Pack and unpack a message in Go
+/// Example 4: Pack and unpack a message in Go
 ///
 ///       foo := &pb.Foo{...}
-///       any, err := ptypes.MarshalAny(foo)
+///       any, err := anypb.New(foo)
+///       if err != nil {
+///         ...
+///       }
 ///       ...
 ///       foo := &pb.Foo{}
-///       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+///       if err := any.UnmarshalTo(foo); err != nil {
 ///         ...
 ///       }
 ///
@@ -1204,7 +1207,7 @@ pub mod generated_code_info {
 ///
 ///
 /// JSON
-/// ====
+///
 /// The JSON representation of an `Any` value uses the regular
 /// representation of the deserialized, embedded message, with an
 /// additional field `@type` which contains the type URL. Example:

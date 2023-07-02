@@ -1234,7 +1234,7 @@ pub mod generated_code_info {
 ///        "value": "1.212s"
 ///      }
 ///
-#[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]
+#[derive(::serde::Serialize, ::serde::Deserialize)]
 #[derive(Eq)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

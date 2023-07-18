@@ -159,6 +159,31 @@ pub mod abci_application_client {
                 .insert(GrpcMethod::new("tendermint.abci.ABCIApplication", "Info"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn set_option(
+            &mut self,
+            request: impl tonic::IntoRequest<::tendermint_proto::abci::RequestSetOption>,
+        ) -> std::result::Result<
+            tonic::Response<::tendermint_proto::abci::ResponseSetOption>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/tendermint.abci.ABCIApplication/SetOption",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("tendermint.abci.ABCIApplication", "SetOption"));
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn deliver_tx(
             &mut self,
             request: impl tonic::IntoRequest<::tendermint_proto::abci::RequestDeliverTx>,
@@ -458,64 +483,6 @@ pub mod abci_application_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn prepare_proposal(
-            &mut self,
-            request: impl tonic::IntoRequest<
-                ::tendermint_proto::abci::RequestPrepareProposal,
-            >,
-        ) -> std::result::Result<
-            tonic::Response<::tendermint_proto::abci::ResponsePrepareProposal>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/tendermint.abci.ABCIApplication/PrepareProposal",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("tendermint.abci.ABCIApplication", "PrepareProposal"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn process_proposal(
-            &mut self,
-            request: impl tonic::IntoRequest<
-                ::tendermint_proto::abci::RequestProcessProposal,
-            >,
-        ) -> std::result::Result<
-            tonic::Response<::tendermint_proto::abci::ResponseProcessProposal>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/tendermint.abci.ABCIApplication/ProcessProposal",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("tendermint.abci.ABCIApplication", "ProcessProposal"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
     }
 }
 /// Generated server implementations.
@@ -545,6 +512,13 @@ pub mod abci_application_server {
             request: tonic::Request<::tendermint_proto::abci::RequestInfo>,
         ) -> std::result::Result<
             tonic::Response<::tendermint_proto::abci::ResponseInfo>,
+            tonic::Status,
+        >;
+        async fn set_option(
+            &self,
+            request: tonic::Request<::tendermint_proto::abci::RequestSetOption>,
+        ) -> std::result::Result<
+            tonic::Response<::tendermint_proto::abci::ResponseSetOption>,
             tonic::Status,
         >;
         async fn deliver_tx(
@@ -622,20 +596,6 @@ pub mod abci_application_server {
             request: tonic::Request<::tendermint_proto::abci::RequestApplySnapshotChunk>,
         ) -> std::result::Result<
             tonic::Response<::tendermint_proto::abci::ResponseApplySnapshotChunk>,
-            tonic::Status,
-        >;
-        async fn prepare_proposal(
-            &self,
-            request: tonic::Request<::tendermint_proto::abci::RequestPrepareProposal>,
-        ) -> std::result::Result<
-            tonic::Response<::tendermint_proto::abci::ResponsePrepareProposal>,
-            tonic::Status,
-        >;
-        async fn process_proposal(
-            &self,
-            request: tonic::Request<::tendermint_proto::abci::RequestProcessProposal>,
-        ) -> std::result::Result<
-            tonic::Response<::tendermint_proto::abci::ResponseProcessProposal>,
             tonic::Status,
         >;
     }
@@ -841,6 +801,53 @@ pub mod abci_application_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = InfoSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/tendermint.abci.ABCIApplication/SetOption" => {
+                    #[allow(non_camel_case_types)]
+                    struct SetOptionSvc<T: AbciApplication>(pub Arc<T>);
+                    impl<
+                        T: AbciApplication,
+                    > tonic::server::UnaryService<
+                        ::tendermint_proto::abci::RequestSetOption,
+                    > for SetOptionSvc<T> {
+                        type Response = ::tendermint_proto::abci::ResponseSetOption;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                ::tendermint_proto::abci::RequestSetOption,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).set_option(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = SetOptionSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1365,104 +1372,6 @@ pub mod abci_application_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ApplySnapshotChunkSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/tendermint.abci.ABCIApplication/PrepareProposal" => {
-                    #[allow(non_camel_case_types)]
-                    struct PrepareProposalSvc<T: AbciApplication>(pub Arc<T>);
-                    impl<
-                        T: AbciApplication,
-                    > tonic::server::UnaryService<
-                        ::tendermint_proto::abci::RequestPrepareProposal,
-                    > for PrepareProposalSvc<T> {
-                        type Response = ::tendermint_proto::abci::ResponsePrepareProposal;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<
-                                ::tendermint_proto::abci::RequestPrepareProposal,
-                            >,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).prepare_proposal(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = PrepareProposalSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/tendermint.abci.ABCIApplication/ProcessProposal" => {
-                    #[allow(non_camel_case_types)]
-                    struct ProcessProposalSvc<T: AbciApplication>(pub Arc<T>);
-                    impl<
-                        T: AbciApplication,
-                    > tonic::server::UnaryService<
-                        ::tendermint_proto::abci::RequestProcessProposal,
-                    > for ProcessProposalSvc<T> {
-                        type Response = ::tendermint_proto::abci::ResponseProcessProposal;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<
-                                ::tendermint_proto::abci::RequestProcessProposal,
-                            >,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).process_proposal(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = ProcessProposalSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

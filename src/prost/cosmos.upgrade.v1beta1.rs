@@ -19,6 +19,7 @@ pub struct Plan {
     #[prost(message, optional, tag = "2")]
     pub time: ::core::option::Option<super::super::super::google::protobuf::Timestamp>,
     /// The height at which the upgrade must be performed.
+    /// Only used if Time is not set.
     #[prost(int64, tag = "3")]
     pub height: i64,
     /// Any application specific upgrade info to be included on-chain
@@ -42,13 +43,10 @@ pub struct Plan {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SoftwareUpgradeProposal {
-    /// title of the proposal
     #[prost(string, tag = "1")]
     pub title: ::prost::alloc::string::String,
-    /// description of the proposal
     #[prost(string, tag = "2")]
     pub description: ::prost::alloc::string::String,
-    /// plan of the proposal
     #[prost(message, optional, tag = "3")]
     pub plan: ::core::option::Option<Plan>,
 }
@@ -60,10 +58,8 @@ pub struct SoftwareUpgradeProposal {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CancelSoftwareUpgradeProposal {
-    /// title of the proposal
     #[prost(string, tag = "1")]
     pub title: ::prost::alloc::string::String,
-    /// description of the proposal
     #[prost(string, tag = "2")]
     pub description: ::prost::alloc::string::String,
 }
@@ -88,7 +84,7 @@ pub struct ModuleVersion {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgSoftwareUpgrade {
-    /// authority is the address that controls the module (defaults to x/gov unless overwritten).
+    /// authority is the address of the governance account.
     #[prost(string, tag = "1")]
     pub authority: ::prost::alloc::string::String,
     /// plan is the upgrade plan.
@@ -109,7 +105,7 @@ pub struct MsgSoftwareUpgradeResponse {}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgCancelUpgrade {
-    /// authority is the address that controls the module (defaults to x/gov unless overwritten).
+    /// authority is the address of the governance account.
     #[prost(string, tag = "1")]
     pub authority: ::prost::alloc::string::String,
 }
@@ -238,7 +234,7 @@ pub mod msg_client {
             self.inner.unary(req, path, codec).await
         }
         /// CancelUpgrade is a governance operation for cancelling a previously
-        /// approved software upgrade.
+        /// approvid software upgrade.
         ///
         /// Since: cosmos-sdk 0.46
         pub async fn cancel_upgrade(
@@ -287,7 +283,7 @@ pub mod msg_server {
             tonic::Status,
         >;
         /// CancelUpgrade is a governance operation for cancelling a previously
-        /// approved software upgrade.
+        /// approvid software upgrade.
         ///
         /// Since: cosmos-sdk 0.46
         async fn cancel_upgrade(

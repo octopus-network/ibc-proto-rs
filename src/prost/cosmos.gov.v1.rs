@@ -2,10 +2,8 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WeightedVoteOption {
-    /// option defines the valid vote options, it must not contain duplicate vote options.
     #[prost(enumeration = "VoteOption", tag = "1")]
     pub option: i32,
-    /// weight is the vote weight associated with the vote option.
     #[prost(string, tag = "2")]
     pub weight: ::prost::alloc::string::String,
 }
@@ -14,13 +12,10 @@ pub struct WeightedVoteOption {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Deposit {
-    /// proposal_id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub proposal_id: u64,
-    /// depositor defines the deposit addresses from the proposals.
     #[prost(string, tag = "2")]
     pub depositor: ::prost::alloc::string::String,
-    /// amount to be deposited by depositor.
     #[prost(message, repeated, tag = "3")]
     pub amount: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
 }
@@ -28,13 +23,10 @@ pub struct Deposit {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Proposal {
-    /// id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub id: u64,
-    /// messages are the arbitrary messages to be executed if the proposal passes.
     #[prost(message, repeated, tag = "2")]
     pub messages: ::prost::alloc::vec::Vec<super::super::super::google::protobuf::Any>,
-    /// status defines the proposal status.
     #[prost(enumeration = "ProposalStatus", tag = "3")]
     pub status: i32,
     /// final_tally_result is the final tally result of the proposal. When
@@ -42,25 +34,20 @@ pub struct Proposal {
     /// proposal's voting period has ended.
     #[prost(message, optional, tag = "4")]
     pub final_tally_result: ::core::option::Option<TallyResult>,
-    /// submit_time is the time of proposal submission.
     #[prost(message, optional, tag = "5")]
     pub submit_time: ::core::option::Option<
         super::super::super::google::protobuf::Timestamp,
     >,
-    /// deposit_end_time is the end time for deposition.
     #[prost(message, optional, tag = "6")]
     pub deposit_end_time: ::core::option::Option<
         super::super::super::google::protobuf::Timestamp,
     >,
-    /// total_deposit is the total deposit on the proposal.
     #[prost(message, repeated, tag = "7")]
     pub total_deposit: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
-    /// voting_start_time is the starting time to vote on a proposal.
     #[prost(message, optional, tag = "8")]
     pub voting_start_time: ::core::option::Option<
         super::super::super::google::protobuf::Timestamp,
     >,
-    /// voting_end_time is the end time of voting on a proposal.
     #[prost(message, optional, tag = "9")]
     pub voting_end_time: ::core::option::Option<
         super::super::super::google::protobuf::Timestamp,
@@ -68,36 +55,17 @@ pub struct Proposal {
     /// metadata is any arbitrary metadata attached to the proposal.
     #[prost(string, tag = "10")]
     pub metadata: ::prost::alloc::string::String,
-    /// title is the title of the proposal
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(string, tag = "11")]
-    pub title: ::prost::alloc::string::String,
-    /// summary is a short summary of the proposal
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(string, tag = "12")]
-    pub summary: ::prost::alloc::string::String,
-    /// Proposer is the address of the proposal sumbitter
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(string, tag = "13")]
-    pub proposer: ::prost::alloc::string::String,
 }
 /// TallyResult defines a standard tally for a governance proposal.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TallyResult {
-    /// yes_count is the number of yes votes on a proposal.
     #[prost(string, tag = "1")]
     pub yes_count: ::prost::alloc::string::String,
-    /// abstain_count is the number of abstain votes on a proposal.
     #[prost(string, tag = "2")]
     pub abstain_count: ::prost::alloc::string::String,
-    /// no_count is the number of no votes on a proposal.
     #[prost(string, tag = "3")]
     pub no_count: ::prost::alloc::string::String,
-    /// no_with_veto_count is the number of no with veto votes on a proposal.
     #[prost(string, tag = "4")]
     pub no_with_veto_count: ::prost::alloc::string::String,
 }
@@ -106,13 +74,10 @@ pub struct TallyResult {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Vote {
-    /// proposal_id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub proposal_id: u64,
-    /// voter is the voter address of the proposal.
     #[prost(string, tag = "2")]
     pub voter: ::prost::alloc::string::String,
-    /// options is the weighted vote options.
     #[prost(message, repeated, tag = "4")]
     pub options: ::prost::alloc::vec::Vec<WeightedVoteOption>,
     /// metadata is any  arbitrary metadata to attached to the vote.
@@ -123,11 +88,11 @@ pub struct Vote {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DepositParams {
-    /// Minimum deposit for a proposal to enter voting period.
+    ///   Minimum deposit for a proposal to enter voting period.
     #[prost(message, repeated, tag = "1")]
     pub min_deposit: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
-    /// Maximum period for Atom holders to deposit on a proposal. Initial value: 2
-    /// months.
+    ///   Maximum period for Atom holders to deposit on a proposal. Initial value: 2
+    ///   months.
     #[prost(message, optional, tag = "2")]
     pub max_deposit_period: ::core::option::Option<
         super::super::super::google::protobuf::Duration,
@@ -137,7 +102,7 @@ pub struct DepositParams {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VotingParams {
-    /// Duration of the voting period.
+    ///   Length of the voting period.
     #[prost(message, optional, tag = "1")]
     pub voting_period: ::core::option::Option<
         super::super::super::google::protobuf::Duration,
@@ -147,61 +112,17 @@ pub struct VotingParams {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TallyParams {
-    /// Minimum percentage of total stake needed to vote for a result to be
-    /// considered valid.
-    #[prost(string, tag = "1")]
-    pub quorum: ::prost::alloc::string::String,
-    /// Minimum proportion of Yes votes for proposal to pass. Default value: 0.5.
-    #[prost(string, tag = "2")]
-    pub threshold: ::prost::alloc::string::String,
-    /// Minimum value of Veto votes to Total votes ratio for proposal to be
-    /// vetoed. Default value: 1/3.
-    #[prost(string, tag = "3")]
-    pub veto_threshold: ::prost::alloc::string::String,
-}
-/// Params defines the parameters for the x/gov module.
-///
-/// Since: cosmos-sdk 0.47
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Params {
-    /// Minimum deposit for a proposal to enter voting period.
-    #[prost(message, repeated, tag = "1")]
-    pub min_deposit: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
-    /// Maximum period for Atom holders to deposit on a proposal. Initial value: 2
-    /// months.
-    #[prost(message, optional, tag = "2")]
-    pub max_deposit_period: ::core::option::Option<
-        super::super::super::google::protobuf::Duration,
-    >,
-    /// Duration of the voting period.
-    #[prost(message, optional, tag = "3")]
-    pub voting_period: ::core::option::Option<
-        super::super::super::google::protobuf::Duration,
-    >,
     ///   Minimum percentage of total stake needed to vote for a result to be
     ///   considered valid.
-    #[prost(string, tag = "4")]
+    #[prost(string, tag = "1")]
     pub quorum: ::prost::alloc::string::String,
     ///   Minimum proportion of Yes votes for proposal to pass. Default value: 0.5.
-    #[prost(string, tag = "5")]
+    #[prost(string, tag = "2")]
     pub threshold: ::prost::alloc::string::String,
     ///   Minimum value of Veto votes to Total votes ratio for proposal to be
     ///   vetoed. Default value: 1/3.
-    #[prost(string, tag = "6")]
+    #[prost(string, tag = "3")]
     pub veto_threshold: ::prost::alloc::string::String,
-    ///   The ratio representing the proportion of the deposit value that must be paid at proposal submission.
-    #[prost(string, tag = "7")]
-    pub min_initial_deposit_ratio: ::prost::alloc::string::String,
-    /// burn deposits if a proposal does not meet quorum
-    #[prost(bool, tag = "13")]
-    pub burn_vote_quorum: bool,
-    /// burn deposits if the proposal does not enter voting period
-    #[prost(bool, tag = "14")]
-    pub burn_proposal_deposit_prevote: bool,
-    /// burn deposits if quorum with vote type no_veto is met
-    #[prost(bool, tag = "15")]
-    pub burn_vote_veto: bool,
 }
 /// VoteOption enumerates the valid vote options for a given governance proposal.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
@@ -299,34 +220,20 @@ impl ProposalStatus {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgSubmitProposal {
-    /// messages are the arbitrary messages to be executed if proposal passes.
     #[prost(message, repeated, tag = "1")]
     pub messages: ::prost::alloc::vec::Vec<super::super::super::google::protobuf::Any>,
-    /// initial_deposit is the deposit value that must be paid at proposal submission.
     #[prost(message, repeated, tag = "2")]
     pub initial_deposit: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
-    /// proposer is the account address of the proposer.
     #[prost(string, tag = "3")]
     pub proposer: ::prost::alloc::string::String,
     /// metadata is any arbitrary metadata attached to the proposal.
     #[prost(string, tag = "4")]
     pub metadata: ::prost::alloc::string::String,
-    /// title is the title of the proposal.
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(string, tag = "5")]
-    pub title: ::prost::alloc::string::String,
-    /// summary is the summary of the proposal
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(string, tag = "6")]
-    pub summary: ::prost::alloc::string::String,
 }
 /// MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgSubmitProposalResponse {
-    /// proposal_id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub proposal_id: u64,
 }
@@ -350,16 +257,12 @@ pub struct MsgExecLegacyContentResponse {}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgVote {
-    /// proposal_id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub proposal_id: u64,
-    /// voter is the voter address for the proposal.
     #[prost(string, tag = "2")]
     pub voter: ::prost::alloc::string::String,
-    /// option defines the vote option.
     #[prost(enumeration = "VoteOption", tag = "3")]
     pub option: i32,
-    /// metadata is any arbitrary metadata attached to the Vote.
     #[prost(string, tag = "4")]
     pub metadata: ::prost::alloc::string::String,
 }
@@ -371,16 +274,12 @@ pub struct MsgVoteResponse {}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgVoteWeighted {
-    /// proposal_id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub proposal_id: u64,
-    /// voter is the voter address for the proposal.
     #[prost(string, tag = "2")]
     pub voter: ::prost::alloc::string::String,
-    /// options defines the weighted vote options.
     #[prost(message, repeated, tag = "3")]
     pub options: ::prost::alloc::vec::Vec<WeightedVoteOption>,
-    /// metadata is any arbitrary metadata attached to the VoteWeighted.
     #[prost(string, tag = "4")]
     pub metadata: ::prost::alloc::string::String,
 }
@@ -392,13 +291,10 @@ pub struct MsgVoteWeightedResponse {}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgDeposit {
-    /// proposal_id defines the unique id of the proposal.
     #[prost(uint64, tag = "1")]
     pub proposal_id: u64,
-    /// depositor defines the deposit addresses from the proposals.
     #[prost(string, tag = "2")]
     pub depositor: ::prost::alloc::string::String,
-    /// amount to be deposited by depositor.
     #[prost(message, repeated, tag = "3")]
     pub amount: ::prost::alloc::vec::Vec<super::super::base::v1beta1::Coin>,
 }
@@ -406,28 +302,6 @@ pub struct MsgDeposit {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgDepositResponse {}
-/// MsgUpdateParams is the Msg/UpdateParams request type.
-///
-/// Since: cosmos-sdk 0.47
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgUpdateParams {
-    /// authority is the address that controls the module (defaults to x/gov unless overwritten).
-    #[prost(string, tag = "1")]
-    pub authority: ::prost::alloc::string::String,
-    /// params defines the x/gov parameters to update.
-    ///
-    /// NOTE: All parameters must be supplied.
-    #[prost(message, optional, tag = "2")]
-    pub params: ::core::option::Option<Params>,
-}
-/// MsgUpdateParamsResponse defines the response structure for executing a
-/// MsgUpdateParams message.
-///
-/// Since: cosmos-sdk 0.47
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgUpdateParamsResponse {}
 /// Generated client implementations.
 #[cfg(feature = "client")]
 pub mod msg_client {
@@ -515,7 +389,7 @@ pub mod msg_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        /// SubmitProposal defines a method to create new proposal given the messages.
+        /// SubmitProposal defines a method to create new proposal given a content.
         pub async fn submit_proposal(
             &mut self,
             request: impl tonic::IntoRequest<super::MsgSubmitProposal>,
@@ -642,35 +516,6 @@ pub mod msg_client {
             req.extensions_mut().insert(GrpcMethod::new("cosmos.gov.v1.Msg", "Deposit"));
             self.inner.unary(req, path, codec).await
         }
-        /// UpdateParams defines a governance operation for updating the x/gov module
-        /// parameters. The authority is defined in the keeper.
-        ///
-        /// Since: cosmos-sdk 0.47
-        pub async fn update_params(
-            &mut self,
-            request: impl tonic::IntoRequest<super::MsgUpdateParams>,
-        ) -> std::result::Result<
-            tonic::Response<super::MsgUpdateParamsResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/cosmos.gov.v1.Msg/UpdateParams",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("cosmos.gov.v1.Msg", "UpdateParams"));
-            self.inner.unary(req, path, codec).await
-        }
     }
 }
 /// Generated server implementations.
@@ -681,7 +526,7 @@ pub mod msg_server {
     /// Generated trait containing gRPC methods that should be implemented for use with MsgServer.
     #[async_trait]
     pub trait Msg: Send + Sync + 'static {
-        /// SubmitProposal defines a method to create new proposal given the messages.
+        /// SubmitProposal defines a method to create new proposal given a content.
         async fn submit_proposal(
             &self,
             request: tonic::Request<super::MsgSubmitProposal>,
@@ -717,17 +562,6 @@ pub mod msg_server {
             request: tonic::Request<super::MsgDeposit>,
         ) -> std::result::Result<
             tonic::Response<super::MsgDepositResponse>,
-            tonic::Status,
-        >;
-        /// UpdateParams defines a governance operation for updating the x/gov module
-        /// parameters. The authority is defined in the keeper.
-        ///
-        /// Since: cosmos-sdk 0.47
-        async fn update_params(
-            &self,
-            request: tonic::Request<super::MsgUpdateParams>,
-        ) -> std::result::Result<
-            tonic::Response<super::MsgUpdateParamsResponse>,
             tonic::Status,
         >;
     }
@@ -1027,50 +861,6 @@ pub mod msg_server {
                     };
                     Box::pin(fut)
                 }
-                "/cosmos.gov.v1.Msg/UpdateParams" => {
-                    #[allow(non_camel_case_types)]
-                    struct UpdateParamsSvc<T: Msg>(pub Arc<T>);
-                    impl<T: Msg> tonic::server::UnaryService<super::MsgUpdateParams>
-                    for UpdateParamsSvc<T> {
-                        type Response = super::MsgUpdateParamsResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::MsgUpdateParams>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).update_params(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = UpdateParamsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 _ => {
                     Box::pin(async move {
                         Ok(
@@ -1124,7 +914,6 @@ pub struct QueryProposalRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryProposalResponse {
-    /// proposal is the requested governance proposal.
     #[prost(message, optional, tag = "1")]
     pub proposal: ::core::option::Option<Proposal>,
 }
@@ -1152,7 +941,6 @@ pub struct QueryProposalsRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryProposalsResponse {
-    /// proposals defines all the requested governance proposals.
     #[prost(message, repeated, tag = "1")]
     pub proposals: ::prost::alloc::vec::Vec<Proposal>,
     /// pagination defines the pagination in the response.
@@ -1176,7 +964,7 @@ pub struct QueryVoteRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryVoteResponse {
-    /// vote defines the queried vote.
+    /// vote defined the queried vote.
     #[prost(message, optional, tag = "1")]
     pub vote: ::core::option::Option<Vote>,
 }
@@ -1197,7 +985,7 @@ pub struct QueryVotesRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryVotesResponse {
-    /// votes defines the queried votes.
+    /// votes defined the queried votes.
     #[prost(message, repeated, tag = "1")]
     pub votes: ::prost::alloc::vec::Vec<Vote>,
     /// pagination defines the pagination in the response.
@@ -1219,26 +1007,15 @@ pub struct QueryParamsRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryParamsResponse {
-    /// Deprecated: Prefer to use `params` instead.
     /// voting_params defines the parameters related to voting.
-    #[deprecated]
     #[prost(message, optional, tag = "1")]
     pub voting_params: ::core::option::Option<VotingParams>,
-    /// Deprecated: Prefer to use `params` instead.
     /// deposit_params defines the parameters related to deposit.
-    #[deprecated]
     #[prost(message, optional, tag = "2")]
     pub deposit_params: ::core::option::Option<DepositParams>,
-    /// Deprecated: Prefer to use `params` instead.
     /// tally_params defines the parameters related to tally.
-    #[deprecated]
     #[prost(message, optional, tag = "3")]
     pub tally_params: ::core::option::Option<TallyParams>,
-    /// params defines all the paramaters of x/gov module.
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(message, optional, tag = "4")]
-    pub params: ::core::option::Option<Params>,
 }
 /// QueryDepositRequest is the request type for the Query/Deposit RPC method.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1276,7 +1053,6 @@ pub struct QueryDepositsRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryDepositsResponse {
-    /// deposits defines the requested deposits.
     #[prost(message, repeated, tag = "1")]
     pub deposits: ::prost::alloc::vec::Vec<Deposit>,
     /// pagination defines the pagination in the response.
@@ -2152,24 +1928,13 @@ pub struct GenesisState {
     /// proposals defines all the proposals present at genesis.
     #[prost(message, repeated, tag = "4")]
     pub proposals: ::prost::alloc::vec::Vec<Proposal>,
-    /// Deprecated: Prefer to use `params` instead.
-    /// deposit_params defines all the paramaters of related to deposit.
-    #[deprecated]
+    /// params defines all the paramaters of related to deposit.
     #[prost(message, optional, tag = "5")]
     pub deposit_params: ::core::option::Option<DepositParams>,
-    /// Deprecated: Prefer to use `params` instead.
-    /// voting_params defines all the paramaters of related to voting.
-    #[deprecated]
+    /// params defines all the paramaters of related to voting.
     #[prost(message, optional, tag = "6")]
     pub voting_params: ::core::option::Option<VotingParams>,
-    /// Deprecated: Prefer to use `params` instead.
-    /// tally_params defines all the paramaters of related to tally.
-    #[deprecated]
+    /// params defines all the paramaters of related to tally.
     #[prost(message, optional, tag = "7")]
     pub tally_params: ::core::option::Option<TallyParams>,
-    /// params defines all the paramaters of x/gov module.
-    ///
-    /// Since: cosmos-sdk 0.47
-    #[prost(message, optional, tag = "8")]
-    pub params: ::core::option::Option<Params>,
 }

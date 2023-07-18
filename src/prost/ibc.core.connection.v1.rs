@@ -242,8 +242,6 @@ pub struct MsgConnectionOpenTry {
     #[prost(string, tag = "12")]
     pub signer: ::prost::alloc::string::String,
     /// optional proof data for host state machines that are unable to introspect their own consensus state
-    #[prost(bytes = "vec", tag = "13")]
-    pub host_consensus_state_proof: ::prost::alloc::vec::Vec<u8>,
 }
 /// MsgConnectionOpenTryResponse defines the Msg/ConnectionOpenTry response type.
 #[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]
@@ -283,8 +281,6 @@ pub struct MsgConnectionOpenAck {
     #[prost(string, tag = "10")]
     pub signer: ::prost::alloc::string::String,
     /// optional proof data for host state machines that are unable to introspect their own consensus state
-    #[prost(bytes = "vec", tag = "11")]
-    pub host_consensus_state_proof: ::prost::alloc::vec::Vec<u8>,
 }
 /// MsgConnectionOpenAckResponse defines the Msg/ConnectionOpenAck response type.
 #[cfg_attr(feature = "std", derive(::serde::Serialize, ::serde::Deserialize))]

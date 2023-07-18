@@ -48,15 +48,17 @@ pub struct Params {
         super::super::super::super::google::protobuf::Duration,
     >,
     /// The threshold for the percentage of validators at the bottom of the set who
-    /// can opt out of running the consumer chain without being punished. For example, a
-    /// value of 0.05 means that the validators in the bottom 5% of the set can opt out
+    /// can opt out of running the consumer chain without being punished. For
+    /// example, a value of 0.05 means that the validators in the bottom 5% of the
+    /// set can opt out
     #[prost(string, tag = "10")]
     pub soft_opt_out_threshold: ::prost::alloc::string::String,
-    /// Reward denoms. These are the denominations which are allowed to be sent to the provider as rewards.
+    /// Reward denoms. These are the denominations which are allowed to be sent to
+    /// the provider as rewards.
     #[prost(string, repeated, tag = "11")]
     pub reward_denoms: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// Provider-originated reward denoms. These are denoms coming from the provider
-    /// which are allowed to be used as rewards. e.g. "uatom"
+    /// Provider-originated reward denoms. These are denoms coming from the
+    /// provider which are allowed to be used as rewards. e.g. "uatom"
     #[prost(string, repeated, tag = "12")]
     pub provider_reward_denoms: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
@@ -142,7 +144,7 @@ pub struct GenesisState {
     pub last_transmission_block_height: ::core::option::Option<
         LastTransmissionBlockHeight,
     >,
-    /// flag indicating whether the consumer CCV module starts in pre-CCV state
+    /// flag indicating whether the consumer CCV module starts in
     #[prost(bool, tag = "13")]
     pub pre_ccv: bool,
 }

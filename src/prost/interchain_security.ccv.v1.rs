@@ -46,12 +46,13 @@ pub struct SlashPacketData {
     pub valset_update_id: u64,
     /// tell if the slashing is for a downtime or a double-signing infraction
     #[prost(
-        enumeration = "super::super::super::cosmos::staking::v1beta1::InfractionType",
+        enumeration = "super::super::super::cosmos::staking::v1beta1::Infraction",
         tag = "3"
     )]
     pub infraction: i32,
 }
-/// MaturedUnbondingOps defines a list of ids corresponding to ids of matured unbonding operations.
+/// MaturedUnbondingOps defines a list of ids corresponding to ids of matured
+/// unbonding operations.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MaturedUnbondingOps {

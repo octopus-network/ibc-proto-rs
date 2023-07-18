@@ -1465,6 +1465,10 @@ pub mod generated_code_info {
 ///      if (any.is(Foo.class)) {
 ///        foo = any.unpack(Foo.class);
 ///      }
+///      // or ...
+///      if (any.isSameTypeAs(Foo.getDefaultInstance())) {
+///        foo = any.unpack(Foo.getDefaultInstance());
+///      }
 ///
 ///   Example 3: Pack and unpack a message in Python.
 ///
@@ -1479,10 +1483,13 @@ pub mod generated_code_info {
 ///   Example 4: Pack and unpack a message in Go
 ///
 ///       foo := &pb.Foo{...}
-///       any, err := ptypes.MarshalAny(foo)
+///       any, err := anypb.New(foo)
+///       if err != nil {
+///         ...
+///       }
 ///       ...
 ///       foo := &pb.Foo{}
-///       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+///       if err := any.UnmarshalTo(foo); err != nil {
 ///         ...
 ///       }
 ///
@@ -1491,7 +1498,6 @@ pub mod generated_code_info {
 /// methods only use the fully qualified type name after the last '/'
 /// in the type URL, for example "foo.bar.com/x/y.z" will yield type
 /// name "y.z".
-///
 ///
 /// JSON
 /// ====

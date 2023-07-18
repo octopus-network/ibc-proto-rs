@@ -1,3 +1,22 @@
+/// StoreKVPair is a KVStore KVPair used for listening to state changes (Sets and Deletes)
+/// It optionally includes the StoreKey for the originating KVStore and a Boolean flag to distinguish between Sets and
+/// Deletes
+///
+/// Since: cosmos-sdk 0.43
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StoreKvPair {
+    /// the store key for the KVStore this pair originates from
+    #[prost(string, tag = "1")]
+    pub store_key: ::prost::alloc::string::String,
+    /// true indicates a delete operation, false indicates a set operation
+    #[prost(bool, tag = "2")]
+    pub delete: bool,
+    #[prost(bytes = "vec", tag = "3")]
+    pub key: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes = "vec", tag = "4")]
+    pub value: ::prost::alloc::vec::Vec<u8>,
+}
 /// CommitInfo defines commit information used by the multi-store when committing
 /// a version/height.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -27,23 +46,4 @@ pub struct CommitId {
     pub version: i64,
     #[prost(bytes = "vec", tag = "2")]
     pub hash: ::prost::alloc::vec::Vec<u8>,
-}
-/// StoreKVPair is a KVStore KVPair used for listening to state changes (Sets and Deletes)
-/// It optionally includes the StoreKey for the originating KVStore and a Boolean flag to distinguish between Sets and
-/// Deletes
-///
-/// Since: cosmos-sdk 0.43
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct StoreKvPair {
-    /// the store key for the KVStore this pair originates from
-    #[prost(string, tag = "1")]
-    pub store_key: ::prost::alloc::string::String,
-    /// true indicates a delete operation, false indicates a set operation
-    #[prost(bool, tag = "2")]
-    pub delete: bool,
-    #[prost(bytes = "vec", tag = "3")]
-    pub key: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes = "vec", tag = "4")]
-    pub value: ::prost::alloc::vec::Vec<u8>,
 }

@@ -7,32 +7,30 @@ pub struct MsgAssignConsumerKey {
     /// The validator address on the provider
     #[prost(string, tag = "2")]
     pub provider_addr: ::prost::alloc::string::String,
-    /// The consensus public key to use on the consumer
-    #[prost(message, optional, tag = "3")]
-    pub consumer_key: ::core::option::Option<
-        super::super::super::super::google::protobuf::Any,
-    >,
+    /// The consensus public key to use on the consumer.
+    /// in json string format corresponding to proto-any, ex:
+    /// `{"@type":"/cosmos.crypto.ed25519.PubKey","key":"Ui5Gf1+mtWUdH8u3xlmzdKID+F3PK0sfXZ73GZ6q6is="}`
+    #[prost(string, tag = "3")]
+    pub consumer_key: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MsgAssignConsumerKeyResponse {}
-/// MsgSubmitConsumerMisbehaviour defines a message that reports a misbehaviour
-/// observed on a consumer chain
+/// MsgRegisterConsumerRewardDenom allows an account to register
+/// a consumer reward denom, i.e., add it to the list of denoms
+/// accepted by the provider as rewards.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgSubmitConsumerMisbehaviour {
+pub struct MsgRegisterConsumerRewardDenom {
     #[prost(string, tag = "1")]
-    pub submitter: ::prost::alloc::string::String,
-    /// The Misbehaviour of the consumer chain wrapping
-    /// two conflicting IBC headers
-    #[prost(message, optional, tag = "2")]
-    pub misbehaviour: ::core::option::Option<
-        super::super::super::super::ibc::lightclients::tendermint::v1::Misbehaviour,
-    >,
+    pub denom: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub depositor: ::prost::alloc::string::String,
 }
+/// MsgRegisterConsumerRewardDenomResponse defines the Msg/RegisterConsumerRewardDenom response type.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MsgSubmitConsumerMisbehaviourResponse {}
+pub struct MsgRegisterConsumerRewardDenomResponse {}
 /// Generated client implementations.
 #[cfg(feature = "client")]
 pub mod msg_client {
@@ -150,11 +148,11 @@ pub mod msg_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn submit_consumer_misbehaviour(
+        pub async fn register_consumer_reward_denom(
             &mut self,
-            request: impl tonic::IntoRequest<super::MsgSubmitConsumerMisbehaviour>,
+            request: impl tonic::IntoRequest<super::MsgRegisterConsumerRewardDenom>,
         ) -> std::result::Result<
-            tonic::Response<super::MsgSubmitConsumerMisbehaviourResponse>,
+            tonic::Response<super::MsgRegisterConsumerRewardDenomResponse>,
             tonic::Status,
         > {
             self.inner
@@ -168,14 +166,14 @@ pub mod msg_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/interchain_security.ccv.provider.v1.Msg/SubmitConsumerMisbehaviour",
+                "/interchain_security.ccv.provider.v1.Msg/RegisterConsumerRewardDenom",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "interchain_security.ccv.provider.v1.Msg",
-                        "SubmitConsumerMisbehaviour",
+                        "RegisterConsumerRewardDenom",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -197,11 +195,11 @@ pub mod msg_server {
             tonic::Response<super::MsgAssignConsumerKeyResponse>,
             tonic::Status,
         >;
-        async fn submit_consumer_misbehaviour(
+        async fn register_consumer_reward_denom(
             &self,
-            request: tonic::Request<super::MsgSubmitConsumerMisbehaviour>,
+            request: tonic::Request<super::MsgRegisterConsumerRewardDenom>,
         ) -> std::result::Result<
-            tonic::Response<super::MsgSubmitConsumerMisbehaviourResponse>,
+            tonic::Response<super::MsgRegisterConsumerRewardDenomResponse>,
             tonic::Status,
         >;
     }
@@ -329,25 +327,27 @@ pub mod msg_server {
                     };
                     Box::pin(fut)
                 }
-                "/interchain_security.ccv.provider.v1.Msg/SubmitConsumerMisbehaviour" => {
+                "/interchain_security.ccv.provider.v1.Msg/RegisterConsumerRewardDenom" => {
                     #[allow(non_camel_case_types)]
-                    struct SubmitConsumerMisbehaviourSvc<T: Msg>(pub Arc<T>);
+                    struct RegisterConsumerRewardDenomSvc<T: Msg>(pub Arc<T>);
                     impl<
                         T: Msg,
-                    > tonic::server::UnaryService<super::MsgSubmitConsumerMisbehaviour>
-                    for SubmitConsumerMisbehaviourSvc<T> {
-                        type Response = super::MsgSubmitConsumerMisbehaviourResponse;
+                    > tonic::server::UnaryService<super::MsgRegisterConsumerRewardDenom>
+                    for RegisterConsumerRewardDenomSvc<T> {
+                        type Response = super::MsgRegisterConsumerRewardDenomResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MsgSubmitConsumerMisbehaviour>,
+                            request: tonic::Request<
+                                super::MsgRegisterConsumerRewardDenom,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).submit_consumer_misbehaviour(request).await
+                                (*inner).register_consumer_reward_denom(request).await
                             };
                             Box::pin(fut)
                         }
@@ -359,7 +359,7 @@ pub mod msg_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = SubmitConsumerMisbehaviourSvc(inner);
+                        let method = RegisterConsumerRewardDenomSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -482,6 +482,14 @@ pub struct ConsumerAdditionProposal {
     /// a ccv enabled consumer chain, the ccv module acts as the staking module.
     #[prost(int64, tag = "13")]
     pub historical_entries: i64,
+    /// The ID of a token transfer channel used for the Reward Distribution
+    /// sub-protocol. If DistributionTransmissionChannel == "", a new transfer
+    /// channel is created on top of the same connection as the CCV channel.
+    /// Note that transfer_channel_id is the ID of the channel end on the consumer chain.
+    /// it is most relevant for chains performing a sovereign to consumer changeover
+    /// in order to maintan the existing ibc transfer channel
+    #[prost(string, tag = "14")]
+    pub distribution_transmission_channel: ::prost::alloc::string::String,
 }
 /// ConsumerRemovalProposal is a governance proposal on the provider chain to remove (and stop) a consumer chain.
 /// If it passes, all the consumer chain's state is removed from the provider chain. The outstanding unbonding
@@ -586,6 +594,11 @@ pub struct Params {
     /// that can be queued for a single consumer before the provider chain halts.
     #[prost(int64, tag = "8")]
     pub max_throttled_packets: i64,
+    /// The fee required to be paid to add a reward denom
+    #[prost(message, optional, tag = "9")]
+    pub consumer_reward_denom_registration_fee: ::core::option::Option<
+        super::super::super::super::cosmos::base::v1beta1::Coin,
+    >,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -595,7 +608,7 @@ pub struct HandshakeMetadata {
     #[prost(string, tag = "2")]
     pub version: ::prost::alloc::string::String,
 }
-/// SlashAcks contains addesses of consumer chain validators
+/// SlashAcks contains cons addresses of consumer chain validators
 /// successfully slashed on the provider chain
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -684,6 +697,42 @@ pub struct KeyAssignmentReplacement {
     pub prev_c_key: ::core::option::Option<::tendermint_proto::crypto::PublicKey>,
     #[prost(int64, tag = "3")]
     pub power: i64,
+}
+/// Used to serialize the ValidatorConsumerPubKey index from key assignment
+/// ValidatorConsumerPubKey: (chainID, providerAddr consAddr) -> consumerKey tmprotocrypto.PublicKey
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ValidatorConsumerPubKey {
+    #[prost(string, tag = "1")]
+    pub chain_id: ::prost::alloc::string::String,
+    #[prost(bytes = "vec", tag = "2")]
+    pub provider_addr: ::prost::alloc::vec::Vec<u8>,
+    #[prost(message, optional, tag = "3")]
+    pub consumer_key: ::core::option::Option<::tendermint_proto::crypto::PublicKey>,
+}
+/// Used to serialize the ValidatorConsumerAddr index from key assignment
+/// ValidatorByConsumerAddr: (chainID, consumerAddr consAddr) -> providerAddr consAddr
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ValidatorByConsumerAddr {
+    #[prost(string, tag = "1")]
+    pub chain_id: ::prost::alloc::string::String,
+    #[prost(bytes = "vec", tag = "2")]
+    pub consumer_addr: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes = "vec", tag = "3")]
+    pub provider_addr: ::prost::alloc::vec::Vec<u8>,
+}
+/// Used to serialize the ConsumerAddrsToPrune index from key assignment
+/// ConsumerAddrsToPrune: (chainID, vscID uint64) -> consumerAddrs AddressList
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConsumerAddrsToPrune {
+    #[prost(string, tag = "1")]
+    pub chain_id: ::prost::alloc::string::String,
+    #[prost(uint64, tag = "2")]
+    pub vsc_id: u64,
+    #[prost(message, optional, tag = "3")]
+    pub consumer_addrs: ::core::option::Option<AddressList>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -830,6 +879,15 @@ pub mod throttled_packet_data_wrapper {
         #[prost(message, tag = "2")]
         VscMaturedPacket(super::super::super::v1::VscMaturedPacketData),
     }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryRegisteredConsumerRewardDenomsRequest {}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryRegisteredConsumerRewardDenomsResponse {
+    #[prost(string, repeated, tag = "1")]
+    pub denoms: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Generated client implementations.
 #[cfg(feature = "client")]
@@ -1176,6 +1234,39 @@ pub mod query_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        /// QueryRegisteredConsumerRewardDenoms returns a list of consumer reward denoms that are registered
+        pub async fn query_registered_consumer_reward_denoms(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::QueryRegisteredConsumerRewardDenomsRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::QueryRegisteredConsumerRewardDenomsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/interchain_security.ccv.provider.v1.Query/QueryRegisteredConsumerRewardDenoms",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "interchain_security.ccv.provider.v1.Query",
+                        "QueryRegisteredConsumerRewardDenoms",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -1253,6 +1344,14 @@ pub mod query_server {
             request: tonic::Request<super::QueryThrottledConsumerPacketDataRequest>,
         ) -> std::result::Result<
             tonic::Response<super::QueryThrottledConsumerPacketDataResponse>,
+            tonic::Status,
+        >;
+        /// QueryRegisteredConsumerRewardDenoms returns a list of consumer reward denoms that are registered
+        async fn query_registered_consumer_reward_denoms(
+            &self,
+            request: tonic::Request<super::QueryRegisteredConsumerRewardDenomsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::QueryRegisteredConsumerRewardDenomsResponse>,
             tonic::Status,
         >;
     }
@@ -1718,6 +1817,57 @@ pub mod query_server {
                     };
                     Box::pin(fut)
                 }
+                "/interchain_security.ccv.provider.v1.Query/QueryRegisteredConsumerRewardDenoms" => {
+                    #[allow(non_camel_case_types)]
+                    struct QueryRegisteredConsumerRewardDenomsSvc<T: Query>(pub Arc<T>);
+                    impl<
+                        T: Query,
+                    > tonic::server::UnaryService<
+                        super::QueryRegisteredConsumerRewardDenomsRequest,
+                    > for QueryRegisteredConsumerRewardDenomsSvc<T> {
+                        type Response = super::QueryRegisteredConsumerRewardDenomsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::QueryRegisteredConsumerRewardDenomsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner)
+                                    .query_registered_consumer_reward_denoms(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = QueryRegisteredConsumerRewardDenomsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 _ => {
                     Box::pin(async move {
                         Ok(
@@ -1839,40 +1989,4 @@ pub struct ValsetUpdateIdToHeight {
     pub valset_update_id: u64,
     #[prost(uint64, tag = "2")]
     pub height: u64,
-}
-/// Used to serialize the ValidatorConsumerPubKey index from key assignment
-/// ValidatorConsumerPubKey: (chainID, providerAddr consAddr) -> consumerKey tmprotocrypto.PublicKey
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ValidatorConsumerPubKey {
-    #[prost(string, tag = "1")]
-    pub chain_id: ::prost::alloc::string::String,
-    #[prost(bytes = "vec", tag = "2")]
-    pub provider_addr: ::prost::alloc::vec::Vec<u8>,
-    #[prost(message, optional, tag = "3")]
-    pub consumer_key: ::core::option::Option<::tendermint_proto::crypto::PublicKey>,
-}
-/// Used to serialize the ValidatorConsumerAddr index from key assignment
-/// ValidatorByConsumerAddr: (chainID, consumerAddr consAddr) -> providerAddr consAddr
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ValidatorByConsumerAddr {
-    #[prost(string, tag = "1")]
-    pub chain_id: ::prost::alloc::string::String,
-    #[prost(bytes = "vec", tag = "2")]
-    pub consumer_addr: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes = "vec", tag = "3")]
-    pub provider_addr: ::prost::alloc::vec::Vec<u8>,
-}
-/// Used to serialize the ConsumerAddrsToPrune index from key assignment
-/// ConsumerAddrsToPrune: (chainID, vscID uint64) -> consumerAddrs AddressList
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ConsumerAddrsToPrune {
-    #[prost(string, tag = "1")]
-    pub chain_id: ::prost::alloc::string::String,
-    #[prost(uint64, tag = "2")]
-    pub vsc_id: u64,
-    #[prost(message, optional, tag = "3")]
-    pub consumer_addrs: ::core::option::Option<AddressList>,
 }

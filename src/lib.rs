@@ -209,7 +209,6 @@ pub mod ibc {
         }
     }
     pub mod lightclients {
-
         pub mod solomachine {
             pub mod v2 {
                 include_proto!("ibc.lightclients.solomachine.v2.rs");
@@ -221,6 +220,11 @@ pub mod ibc {
         pub mod tendermint {
             pub mod v1 {
                 include_proto!("ibc.lightclients.tendermint.v1.rs");
+            }
+        }
+        pub mod near {
+            pub mod v1 {
+                include_proto!("ibc.lightclients.near.v1.rs");
             }
         }
     }

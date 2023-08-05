@@ -110,6 +110,12 @@ pub mod cosmos {
                 include_proto!("cosmos.crypto.multisig.v1beta1.rs");
             }
         }
+        pub mod ed25519 {
+            include_proto!("cosmos.crypto.ed25519.rs");
+        }
+        pub mod secp256k1 {
+            include_proto!("cosmos.crypto.secp256k1.rs");
+        }
     }
     pub mod tx {
         pub mod signing {
@@ -207,6 +213,12 @@ pub mod ibc {
         pub mod solomachine {
             pub mod v1 {
                 include_proto!("ibc.lightclients.solomachine.v1.rs");
+            }
+            pub mod v2 {
+                include_proto!("ibc.lightclients.solomachine.v2.rs");
+            }
+            pub mod v3 {
+                include_proto!("ibc.lightclients.solomachine.v3.rs");
             }
         }
         pub mod tendermint {

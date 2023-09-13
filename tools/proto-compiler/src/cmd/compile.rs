@@ -72,6 +72,7 @@ impl CompileCmd {
             format!("{}/cosmos/bank", sdk_dir.display()),
             format!("{}/cosmos/staking", sdk_dir.display()),
             format!("{}/cosmos/upgrade", sdk_dir.display()),
+            format!("{}/cosmos/crypto", sdk_dir.display()),
             format!("{}/interchain_security/ccv/v1", ics_dir.display()),
             format!("{}/interchain_security/ccv/provider", ics_dir.display()),
             format!("{}/interchain_security/ccv/consumer", ics_dir.display()),

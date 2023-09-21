@@ -63,6 +63,7 @@ impl CompileCmd {
         // Paths
         let proto_paths = [
             format!("{}/../../definitions/mock", root),
+            format!("{}/../../definitions/ibc/lightclients/localhost/v1", root),
             format!("{}/../../definitions/stride/interchainquery/v1", root),
             format!("{}/ibc", ibc_dir.display()),
             format!("{}/cosmos/auth", sdk_dir.display()),
@@ -83,6 +84,7 @@ impl CompileCmd {
             format!("{}", ibc_dir.display()),
             format!("{}", ics_dir.display()),
             format!("{}/../../definitions/mock", root),
+            format!("{}/../../definitions/ibc/lightclients/localhost/v1", root),
             format!("{}/../../definitions/stride/interchainquery/v1", root),
         ];
 

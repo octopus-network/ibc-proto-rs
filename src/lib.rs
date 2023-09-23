@@ -124,6 +124,12 @@ pub mod cosmos {
                 include_proto!("cosmos.crypto.multisig.v1beta1.rs");
             }
         }
+        pub mod ed25519 {
+            include_proto!("cosmos.crypto.ed25519.rs");
+        }
+        pub mod secp256k1 {
+            include_proto!("cosmos.crypto.secp256k1.rs");
+        }
     }
     pub mod tx {
         pub mod config {

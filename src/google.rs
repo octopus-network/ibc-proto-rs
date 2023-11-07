@@ -235,6 +235,7 @@ pub mod protobuf {
 
         use alloc::string::String;
         use alloc::vec::Vec;
+        use borsh::io::Read;
 
         #[cfg_attr(
             feature = "parity-scale-codec",
@@ -255,10 +256,10 @@ pub mod protobuf {
 
         #[cfg(feature = "borsh")]
         impl borsh::BorshSerialize for Any {
-            fn serialize<W: borsh::maybestd::io::Write>(
+            fn serialize<W: borsh::io::Write>(
                 &self,
                 writer: &mut W,
-            ) -> borsh::maybestd::io::Result<()> {
+            ) -> borsh::io::Result<()> {
                 let inner_any = InnerAny {
                     type_url: self.type_url.clone(),
                     value: self.value.clone(),
@@ -270,8 +271,8 @@ pub mod protobuf {
 
         #[cfg(feature = "borsh")]
         impl borsh::BorshDeserialize for Any {
-            fn deserialize(reader: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
-                let inner_any = InnerAny::deserialize(reader)?;
+            fn deserialize_reader<R: Read>(reader: &mut R) -> borsh::io::Result<Self> {
+                let inner_any = InnerAny::deserialize_reader(reader)?;
 
                 Ok(Any {
                     type_url: inner_any.type_url,

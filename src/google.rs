@@ -255,10 +255,10 @@ pub mod protobuf {
 
         #[cfg(feature = "borsh")]
         impl borsh::BorshSerialize for Any {
-            fn serialize<W: borsh::maybestd::io::Write>(
+            fn serialize<W: borsh::io::Write>(
                 &self,
                 writer: &mut W,
-            ) -> borsh::maybestd::io::Result<()> {
+            ) -> borsh::io::Result<()> {
                 let inner_any = InnerAny {
                     type_url: self.type_url.clone(),
                     value: self.value.clone(),
@@ -270,9 +270,9 @@ pub mod protobuf {
 
         #[cfg(feature = "borsh")]
         impl borsh::BorshDeserialize for Any {
-            fn deserialize_reader<R: borsh::maybestd::io::Read>(
+            fn deserialize_reader<R: borsh::io::Read>(
                 reader: &mut R,
-            ) -> borsh::maybestd::io::Result<Self> {
+            ) -> borsh::io::Result<Self> {
                 let inner_any = InnerAny::deserialize_reader(reader)?;
 
                 Ok(Any {
